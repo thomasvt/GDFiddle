@@ -1,6 +1,8 @@
 ﻿using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = System.Drawing.Rectangle;
 
 namespace GDFiddle.UI
 {
@@ -9,25 +11,29 @@ namespace GDFiddle.UI
         public readonly Font Font;
         private readonly GrowingArray<VertexPositionColorTexture> _vertices;
         private readonly GrowingArray<RenderCommand> _renderCommands;
-        private Vector2 _offset;
-        private Vector2 _size;
+        private readonly Stack<Rectangle> _areaStack;
 
         public Renderer(Font font)
         {
             Font = font;
             _vertices = new GrowingArray<VertexPositionColorTexture>(500);
             _renderCommands = new GrowingArray<RenderCommand>(50);
+            _areaStack = new Stack<Rectangle>();
         }
 
-        public void BeginFrame()
+        public void BeginFrame(Rectangle viewArea)
         {
             _vertices.Clear();
             _renderCommands.Clear();
+            _areaStack.Clear();
+            _areaStack.Push(viewArea);
         }
 
         public void FillRectangle(Vector2 topLeft, Vector2 size, Color color)
         {
+            var startVertexIdx = _vertices.Index;
             AppendQuad(topLeft, topLeft + size, Vector2.Zero, Vector2.Zero, color);
+            _renderCommands.Add(new RenderCommand(_areaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 
         private void AppendQuad(Vector2 min, Vector2 max, Vector2 uvMin, Vector2 uvMax, Color color)
@@ -57,7 +63,7 @@ namespace GDFiddle.UI
                 AppendQuad(glyphInfo.QuadMin, glyphInfo.QuadMax, glyphInfo.UVMin, glyphInfo.UVMax, color);
             }
             
-            _renderCommands.Add(new RenderCommand(_offset, _size, startVertexIdx, (_vertices.Index - startVertexIdx) / 3, font.TextureFilename));
+            _renderCommands.Add(new RenderCommand(_areaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3, font.TextureFilename));
         }
 
         public Vector2 MeasureText(string text, Font? font = null)
@@ -75,10 +81,13 @@ namespace GDFiddle.UI
             };
         }
 
-        public void PushViewport(Vector2 offset, Vector2 size)
+        public IDisposable CreateSubArea(Rectangle subArea)
         {
-            _offset = offset;
-            _size = size;
+            var parentArea = _areaStack.Peek();
+            if (parentArea.Width < subArea.X + subArea.Width || parentArea.Height < subArea.Y + subArea.Height)
+                throw new ArgumentOutOfRangeException(nameof(subArea), $"New sub area ({subArea}) does not fit in parent area ({parentArea}).");
+            _areaStack.Push(new Rectangle(parentArea.X + subArea.X, parentArea.Y + subArea.Y, subArea.Width, subArea.Height));
+            return new AreaScope(_areaStack);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GDFiddle.UI.Controls;
+﻿using System.Drawing;
+using GDFiddle.UI.Controls;
 using GDFiddle.UI.Text;
 
 namespace GDFiddle.UI
@@ -10,21 +11,17 @@ namespace GDFiddle.UI
 
         public GUI(Font defaultFont)
         {
-            Controls = new List<IControl>();
             DefaultFont = defaultFont;
             _renderer = new Renderer(DefaultFont);
         }
 
-        public RenderData ProduceRenderData()
+        public RenderData Render(Rectangle viewArea)
         {
-            _renderer.BeginFrame();
-            foreach (var control in Controls)
-            {
-                control.Render(_renderer);
-            }
+            _renderer.BeginFrame(viewArea);
+            RootControl?.Render(_renderer, viewArea.Size);
             return _renderer.ProduceRenderData();
         }
 
-        public List<IControl> Controls { get; set; }
+        public IControl? RootControl { get; set; }
     }
 }

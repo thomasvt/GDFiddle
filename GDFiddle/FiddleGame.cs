@@ -1,8 +1,12 @@
-﻿using GDFiddle.UI;
+﻿using System.Drawing;
+using GDFiddle.UI;
 using GDFiddle.UI.Controls;
+using GDFiddle.UI.Controls.Grids;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace GDFiddle
 {
@@ -64,8 +68,9 @@ namespace GDFiddle
         {
             GraphicsDevice.Clear(new Color(10, 10, 10));
 
-            
-            var renderData = _gui.ProduceRenderData();
+
+            var viewport = GraphicsDevice.Viewport;
+            var renderData = _gui.Render(new System.Drawing.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height));
 
             _effect.World = Matrix.Identity;
             _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
@@ -80,20 +85,28 @@ namespace GDFiddle
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
-            _effect.CurrentTechnique.Passes[0].Apply();
-
             foreach (var command in renderData.RenderCommands)
             {
-                GraphicsDevice.ScissorRectangle = new Rectangle((int)command.Offset.X, (int)command.Offset.Y, (int)command.Size.X, (int)command.Size.Y);
+                GraphicsDevice.ScissorRectangle = command.ScissorRectangle.ToXna();
+                _effect.World = Matrix.CreateTranslation(command.ScissorRectangle.X, command.ScissorRectangle.Y, 0f);
                 _effect.TextureEnabled = command.Texture != null;
-                
+                _effect.CurrentTechnique.Passes[0].Apply();
+
                 GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderData.Vertices, command.VertexOffset, command.TriangleCount);
             }
         }
 
         private void BuildGui()
         {
-            _gui.Controls.Add(new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White});
+            _gui.RootControl = new Grid
+            {
+                Children =
+                {
+                    { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 1, Row = 1 } }
+                },
+                ColumnDefinitions = { GridLength.Star(), GridLength.Star(2) },
+                RowDefinitions = { GridLength.Star(2), GridLength.Star() }
+            };
         }
 
         protected override void Dispose(bool disposing)

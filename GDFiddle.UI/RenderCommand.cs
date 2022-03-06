@@ -1,18 +1,17 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Drawing;
 
 namespace GDFiddle.UI
 {
     public readonly struct RenderCommand
     {
-        public readonly Vector2 Offset, Size;
+        public readonly Rectangle ScissorRectangle;
         public readonly int VertexOffset;
         public readonly int TriangleCount;
         public readonly string? Texture;
 
-        public RenderCommand(Vector2 offset, Vector2 size, int vertexOffset, int triangleCount, string? texture)
+        public RenderCommand(Rectangle scissorRectangle, int vertexOffset, int triangleCount, string? texture = null)
         {
-            Offset = offset;
-            Size = size;
+            ScissorRectangle = scissorRectangle;
             VertexOffset = vertexOffset;
             TriangleCount = triangleCount;
             Texture = texture;
