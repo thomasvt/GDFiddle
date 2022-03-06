@@ -2,6 +2,7 @@
 {
     public enum GridUnitType
     {
-        Star
+        Star,
+        Pixel
     }
 }

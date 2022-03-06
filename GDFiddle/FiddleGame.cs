@@ -17,6 +17,7 @@ namespace GDFiddle
         private readonly GUI _gui;
         private BasicEffect? _effect;
         private Texture2D? _fontTexture;
+        private MouseState _previousMouseState;
 
         public FiddleGame()
         {
@@ -63,9 +64,13 @@ namespace GDFiddle
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            var mouse = Mouse.GetState(Window);
-            var mousePosition = new Vector2(mouse.X, mouse.Y);
-            _gui.Update(GetViewArea(), mousePosition);
+            var mouseState = Mouse.GetState(Window);
+            var mousePosition = new Vector2(mouseState.X, mouseState.Y);
+            var mouseWentDown = mouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
+            var mouseWentUp = mouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
+            _gui.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
+            Mouse.SetCursor(_gui.MouseCursor);
+            _previousMouseState = mouseState;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -101,16 +106,16 @@ namespace GDFiddle
         private Rectangle GetViewArea()
         {
             var viewport = GraphicsDevice.Viewport;
-            var viewArea = new System.Drawing.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+            var viewArea = new Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height);
             return viewArea;
         }
 
         private void BuildGui()
         {
-            _gui.RootControl = new Grid
+            _gui.Root = new Grid
             {
                 Background = new Color(66, 66, 80),
-                ColumnDefinitions = { GridLength.Star(3), GridLength.Star() },
+                ColumnDefinitions = { GridLength.Star(3), GridLength.Pixels(3), GridLength.Star() },
                 Children = {
                     { 
                         new Grid {
@@ -118,8 +123,9 @@ namespace GDFiddle
                             Children = {
                                 { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 0, Row = 0 } }
                             }
-                        }, new GridProperties { Column = 1, Row = 0 }
-                    }
+                        }, new GridProperties { Column = 2, Row = 0 }
+                    },
+                    { new GridSplitter { Background = new Color(58,58, 70) }, new GridProperties { Column = 1, Row = 0 } }
                 }
             };
         }

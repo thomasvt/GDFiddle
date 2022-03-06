@@ -4,9 +4,9 @@ namespace GDFiddle
 {
     internal static class XnaExtensions
     {
-        public static Rectangle ToXna(this System.Drawing.Rectangle r)
+        public static Rectangle ToXna(this System.Drawing.RectangleF r)
         {
-            return new Rectangle(r.X, r.Y, r.Width, r.Height);
+            return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
         }
     }
 }

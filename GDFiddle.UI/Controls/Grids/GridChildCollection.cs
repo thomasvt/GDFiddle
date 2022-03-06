@@ -4,11 +4,13 @@ namespace GDFiddle.UI.Controls.Grids
 {
     public class GridChildCollection : IEnumerable<GridItemContainer>
     {
-        private readonly List<GridItemContainer> _children;
+        private readonly Grid _owner;
+        private readonly Dictionary<Control, GridItemContainer> _children;
 
-        public GridChildCollection()
+        public GridChildCollection(Grid owner)
         {
-            _children = new List<GridItemContainer>();
+            _owner = owner;
+            _children = new Dictionary<Control, GridItemContainer>();
         }
 
         public void Add(Control control)
@@ -18,12 +20,23 @@ namespace GDFiddle.UI.Controls.Grids
 
         public void Add(Control control, GridProperties gridProperties)
         {
-            _children.Add(new GridItemContainer { Control = control, GridProperties = gridProperties });
+            _children.Add(control, new GridItemContainer { Control = control, GridProperties = gridProperties });
+            control.Parent = _owner;
+        }
+
+        /// <summary>
+        /// Returns the GridProperties instance associated with a child.
+        /// </summary>
+        public GridProperties GetGridProperties(Control child)
+        {
+            if (!_children.TryGetValue(child, out var result))
+                throw new ArgumentOutOfRangeException(nameof(child), $"That is not a child of this Grid");
+            return result.GridProperties;
         }
 
         public IEnumerator<GridItemContainer> GetEnumerator()
         {
-            return _children.GetEnumerator();
+            return _children.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

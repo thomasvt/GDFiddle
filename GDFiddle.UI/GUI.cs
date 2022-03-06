@@ -1,7 +1,9 @@
 ﻿using System.Drawing;
 using System.Numerics;
 using GDFiddle.UI.Controls;
+using GDFiddle.UI.Controls.Grids;
 using GDFiddle.UI.Text;
+using Microsoft.Xna.Framework.Input;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace GDFiddle.UI
@@ -10,6 +12,9 @@ namespace GDFiddle.UI
     {
         private readonly Renderer _renderer;
         private Control? _mouseOverControl;
+        private Control? _mouseCapturer;
+        private Vector2 _previousMousePosition;
+        private Control? _root;
         public Font DefaultFont { get; }
 
         public GUI(Font defaultFont)
@@ -18,22 +23,88 @@ namespace GDFiddle.UI
             _renderer = new Renderer(DefaultFont);
         }
 
-        public void Update(Rectangle viewArea, Vector2 mousePosition)
+        public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
-            RootControl?.Arrange(viewArea.Size);
-            var mouseOverControl = viewArea.Contains(new Point((int)mousePosition.X, (int)mousePosition.Y)) ? RootControl?.GetControlAt(mousePosition) : null;
-            if (_mouseOverControl != null) _mouseOverControl.IsMouseOver = false;
-            if (mouseOverControl != null) mouseOverControl.IsMouseOver = true;
-            _mouseOverControl = mouseOverControl;
+            Root?.Arrange(viewArea.Size);
+            ProcessMouse(viewArea, mousePosition, mouseWentDown, mouseWentUp);
+        }
+
+        private void ProcessMouse(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
+        {
+            if (_mouseCapturer != null)
+            {
+                // todo when draging splitter outside window, it doesnt resize all the way to the edge of the window.
+                LetControlProcessMouse(_mouseCapturer, mousePosition, mouseWentDown, mouseWentUp);
+                _previousMousePosition = mousePosition;
+                return;
+            }
+
+            var mouseOverControl = viewArea.Contains(new Point((int) mousePosition.X, (int) mousePosition.Y))
+                ? Root?.GetControlAt(mousePosition)
+                : null;
+            if (mouseOverControl != _mouseOverControl)
+            {
+                if (_mouseOverControl != null) _mouseOverControl.IsMouseOver = false;
+                if (mouseOverControl != null) mouseOverControl.IsMouseOver = true;
+                _mouseOverControl = mouseOverControl;
+            }
+
+            if (_mouseOverControl != null)
+                LetControlProcessMouse(_mouseOverControl, mousePosition, mouseWentDown, mouseWentUp);
+            else
+                MouseCursor = MouseCursor.Arrow;
+
+            _previousMousePosition = mousePosition;
+        }
+
+        private void LetControlProcessMouse(Control control, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
+        {
+            if (mouseWentDown) control.NotifyMouseDown(mousePosition);
+            if (mouseWentUp) control.NotifyMouseUp(mousePosition);
+            if (_previousMousePosition != mousePosition) control.NotifyMouseMove(_previousMousePosition, mousePosition);
+            MouseCursor = control.MouseCursor;
         }
 
         public RenderData Render(Rectangle viewArea)
         {
             _renderer.BeginFrame(viewArea);
-            RootControl?.Render(_renderer, viewArea.Size);
+            Root?.Render(_renderer, viewArea.Size);
             return _renderer.GetRenderData();
         }
 
-        public Control? RootControl { get; set; }
+        public void CaptureMouse(Control capturer)
+        {
+            _mouseCapturer = capturer;
+            if (capturer != _mouseOverControl && _mouseOverControl != null)
+            {
+                _mouseOverControl.IsMouseOver = false;
+                _mouseOverControl = null;
+            };
+        }
+
+        public void ReleaseMouse()
+        {
+            _mouseCapturer = null;
+        }
+
+        public bool HasMouseCapture(Control control)
+        {
+            return _mouseCapturer == control;
+        }
+
+        public Control? Root
+        {
+            get => _root;
+            set
+            {
+                _root = value ?? throw new ArgumentNullException(nameof(value));
+                _root.GUI = this;
+            }
+        }
+
+        /// <summary>
+        /// Defines what the mouse cursor currently should look like.
+        /// </summary>
+        public MouseCursor MouseCursor { get; set; } = MouseCursor.Arrow;
     }
 }

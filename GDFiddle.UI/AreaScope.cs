@@ -4,9 +4,9 @@ namespace GDFiddle.UI
 {
     internal class AreaScope : IDisposable
     {
-        private readonly Stack<Rectangle> _areaStack;
+        private readonly Stack<RectangleF> _areaStack;
 
-        public AreaScope(Stack<Rectangle> areaStack)
+        public AreaScope(Stack<RectangleF> areaStack)
         {
             _areaStack = areaStack;
         }

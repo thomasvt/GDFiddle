@@ -4,12 +4,12 @@ namespace GDFiddle.UI
 {
     public readonly struct RenderCommand
     {
-        public readonly Rectangle ScissorRectangle;
+        public readonly RectangleF ScissorRectangle;
         public readonly int VertexOffset;
         public readonly int TriangleCount;
         public readonly string? Texture;
 
-        public RenderCommand(Rectangle scissorRectangle, int vertexOffset, int triangleCount, string? texture = null)
+        public RenderCommand(RectangleF scissorRectangle, int vertexOffset, int triangleCount, string? texture = null)
         {
             ScissorRectangle = scissorRectangle;
             VertexOffset = vertexOffset;

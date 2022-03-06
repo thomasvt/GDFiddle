@@ -1,6 +1,5 @@
 ﻿using System.Drawing;
 using System.Numerics;
-using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = System.Drawing.Rectangle;
 
 namespace GDFiddle.UI.Controls.Grids
@@ -12,7 +11,7 @@ namespace GDFiddle.UI.Controls.Grids
 
         public Grid()
         {
-            Children = new GridChildCollection();
+            Children = new GridChildCollection(this);
             _columnDistributor = new GridPartSizeCalculator();
             _rowDistributor = new GridPartSizeCalculator();
         }
@@ -32,8 +31,7 @@ namespace GDFiddle.UI.Controls.Grids
 
         public override void Render(Renderer renderer, Size size)
         {
-            renderer.FillRectangle(new Vector2(0,0), new Vector2(size.Width, size.Height), Background);
-
+            base.Render(renderer, size);
             foreach (var child in Children)
             {
                 var horizontalActual = _columnDistributor.GetActualLayout(child.GridProperties.Column);
@@ -62,7 +60,6 @@ namespace GDFiddle.UI.Controls.Grids
 
         public GridChildCollection Children { get; }
 
-        public Color Background { get; set; }
         public List<GridLength> ColumnDefinitions => _columnDistributor.PartDefinitions;
         public List<GridLength> RowDefinitions => _rowDistributor.PartDefinitions;
     }

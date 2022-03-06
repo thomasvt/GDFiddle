@@ -7,6 +7,7 @@ namespace GDFiddle.UI.Controls
     {
         public override void Render(Renderer renderer, Size size)
         {
+            base.Render(renderer, size);
             renderer.DrawText(0,0, Text, Foreground);
         }
 

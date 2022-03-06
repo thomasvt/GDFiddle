@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
@@ -11,14 +12,14 @@ namespace GDFiddle.UI
         public readonly Font Font;
         private readonly GrowingArray<VertexPositionColorTexture> _vertices;
         private readonly GrowingArray<RenderCommand> _renderCommands;
-        private readonly Stack<Rectangle> _areaStack;
+        private readonly Stack<RectangleF> _areaStack;
 
         public Renderer(Font font)
         {
             Font = font;
             _vertices = new GrowingArray<VertexPositionColorTexture>(500);
             _renderCommands = new GrowingArray<RenderCommand>(50);
-            _areaStack = new Stack<Rectangle>();
+            _areaStack = new Stack<RectangleF>();
         }
 
         public void BeginFrame(Rectangle viewArea)
@@ -81,12 +82,10 @@ namespace GDFiddle.UI
             };
         }
 
-        public IDisposable CreateSubArea(Rectangle subArea)
+        public IDisposable CreateSubArea(RectangleF subArea)
         {
             var parentArea = _areaStack.Peek();
-            if (parentArea.Width < subArea.X + subArea.Width || parentArea.Height < subArea.Y + subArea.Height)
-                throw new ArgumentOutOfRangeException(nameof(subArea), $"New sub area ({subArea}) does not fit in parent area ({parentArea}).");
-            _areaStack.Push(new Rectangle(parentArea.X + subArea.X, parentArea.Y + subArea.Y, subArea.Width, subArea.Height));
+            _areaStack.Push(new RectangleF(parentArea.X + subArea.X, parentArea.Y + subArea.Y, subArea.Width, subArea.Height));
             return new AreaScope(_areaStack);
         }
     }
