@@ -1,19 +1,12 @@
 ﻿using System.Drawing;
-using Microsoft.Xna.Framework;
 using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDFiddle.UI.Controls
 {
-    public class TextBlock : IControl
+    public class TextBlock : Control
     {
-        public Vector2 Measure(Renderer renderer)
+        public override void Render(Renderer renderer, Size size)
         {
-            return renderer.MeasureText(Text);
-        }
-
-        public void Render(Renderer renderer, Size size)
-        {
-            renderer.FillRectangle(Vector2.Zero, new Vector2(size.Width, size.Height), Color.Gray);
             renderer.DrawText(0,0, Text, Foreground);
         }
 

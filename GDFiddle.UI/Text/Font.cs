@@ -1,6 +1,6 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
-using Microsoft.Xna.Framework;
 
 namespace GDFiddle.UI.Text
 {

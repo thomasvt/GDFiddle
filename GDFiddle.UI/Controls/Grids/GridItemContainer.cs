@@ -1,8 +1,8 @@
-﻿namespace GDFiddle.UI.Controls
+﻿namespace GDFiddle.UI.Controls.Grids
 {
     public class GridItemContainer
     {
-        public IControl Control { get; set; }
+        public Control Control { get; set; }
         public GridProperties GridProperties { get; set; }
     }
 }

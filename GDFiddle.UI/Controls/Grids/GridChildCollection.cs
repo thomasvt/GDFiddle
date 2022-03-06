@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace GDFiddle.UI.Controls
+namespace GDFiddle.UI.Controls.Grids
 {
     public class GridChildCollection : IEnumerable<GridItemContainer>
     {
@@ -11,12 +11,12 @@ namespace GDFiddle.UI.Controls
             _children = new List<GridItemContainer>();
         }
 
-        public void Add(IControl control)
+        public void Add(Control control)
         {
             Add(control, GridProperties.Default());
         }
 
-        public void Add(IControl control, GridProperties gridProperties)
+        public void Add(Control control, GridProperties gridProperties)
         {
             _children.Add(new GridItemContainer { Control = control, GridProperties = gridProperties });
         }

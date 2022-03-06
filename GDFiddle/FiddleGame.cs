@@ -1,24 +1,27 @@
-﻿using System.Drawing;
-using GDFiddle.UI;
+﻿using GDFiddle.UI;
 using GDFiddle.UI.Controls;
 using GDFiddle.UI.Controls.Grids;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using Rectangle = System.Drawing.Rectangle;
+using Vector2 = System.Numerics.Vector2;
 
 namespace GDFiddle
 {
     internal class FiddleGame : Game
     {
-        private BasicEffect? _effect;
         private readonly GraphicsDeviceManager _gdm;
-        private GUI _gui;
-        private Texture2D _fontTexture;
+        private readonly GUI _gui;
+        private BasicEffect? _effect;
+        private Texture2D? _fontTexture;
 
         public FiddleGame()
         {
+            var defaultFont = Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt");
+            _gui = new GUI(defaultFont);
             _gdm = new GraphicsDeviceManager(this);
             IsMouseVisible = true;
         }
@@ -29,14 +32,12 @@ namespace GDFiddle
             _gdm.PreferredBackBufferHeight = 900;
             _gdm.ApplyChanges();
 
-            var defaultFont = Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt");
-            _gui = new GUI(defaultFont);
-            
             base.Initialize();
         }
 
         protected override void LoadContent()
         {
+
             _effect = new BasicEffect(GraphicsDevice);
             _fontTexture = Texture2D.FromFile(GraphicsDevice, _gui.DefaultFont.TextureFilename);
             ConvertGrayValueToTransparency(_fontTexture);
@@ -62,15 +63,16 @@ namespace GDFiddle
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            var mouse = Mouse.GetState(Window);
+            var mousePosition = new Vector2(mouse.X, mouse.Y);
+            _gui.Update(GetViewArea(), mousePosition);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(new Color(10, 10, 10));
 
-
-            var viewport = GraphicsDevice.Viewport;
-            var renderData = _gui.Render(new System.Drawing.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height));
+            var renderData = _gui.Render(GetViewArea());
 
             _effect.World = Matrix.Identity;
             _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
@@ -96,16 +98,29 @@ namespace GDFiddle
             }
         }
 
+        private Rectangle GetViewArea()
+        {
+            var viewport = GraphicsDevice.Viewport;
+            var viewArea = new System.Drawing.Rectangle(viewport.X, viewport.Y, viewport.Width, viewport.Height);
+            return viewArea;
+        }
+
         private void BuildGui()
         {
             _gui.RootControl = new Grid
             {
-                Children =
-                {
-                    { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 1, Row = 1 } }
-                },
-                ColumnDefinitions = { GridLength.Star(), GridLength.Star(2) },
-                RowDefinitions = { GridLength.Star(2), GridLength.Star() }
+                Background = new Color(66, 66, 80),
+                ColumnDefinitions = { GridLength.Star(3), GridLength.Star() },
+                Children = {
+                    { 
+                        new Grid {
+                            Background = new Color(51, 51, 61),
+                            Children = {
+                                { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 0, Row = 0 } }
+                            }
+                        }, new GridProperties { Column = 1, Row = 0 }
+                    }
+                }
             };
         }
 

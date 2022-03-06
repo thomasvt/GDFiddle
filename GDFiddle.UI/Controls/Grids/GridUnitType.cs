@@ -1,4 +1,4 @@
-﻿namespace GDFiddle.UI.Controls
+﻿namespace GDFiddle.UI.Controls.Grids
 {
     public enum GridUnitType
     {

@@ -1,5 +1,5 @@
-﻿using GDFiddle.UI.Text;
-using Microsoft.Xna.Framework;
+﻿using System.Numerics;
+using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = System.Drawing.Rectangle;
@@ -36,24 +36,6 @@ namespace GDFiddle.UI
             _renderCommands.Add(new RenderCommand(_areaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 
-        private void AppendQuad(Vector2 min, Vector2 max, Vector2 uvMin, Vector2 uvMax, Color color)
-        {
-            _vertices.EnsureCapacity(6);
-
-            var a = new VertexPositionColorTexture(new Vector3(min.X, min.Y, 0), color, uvMin);
-            var b = new VertexPositionColorTexture(new Vector3(max.X, min.Y, 0), color, new Vector2(uvMax.X, uvMin.Y));
-            var c = new VertexPositionColorTexture(new Vector3(max.X, max.Y, 0), color, uvMax);
-            var d = new VertexPositionColorTexture(new Vector3(min.X, max.Y, 0), color, new Vector2(uvMin.X, uvMax.Y));
-
-            _vertices.Add(a);
-            _vertices.Add(b);
-            _vertices.Add(c);
-
-            _vertices.Add(a);
-            _vertices.Add(c);
-            _vertices.Add(d);
-        }
-
         public void DrawText(int x, int y, string text, Color color, Font? font = null)
         {
             font ??= Font;
@@ -72,7 +54,25 @@ namespace GDFiddle.UI
             return font.Measure(text);
         }
 
-        public RenderData ProduceRenderData()
+        private void AppendQuad(Vector2 min, Vector2 max, Vector2 uvMin, Vector2 uvMax, Color color)
+        {
+            _vertices.EnsureCapacity(6);
+
+            var a = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(min.X, min.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMin.X, uvMin.Y));
+            var b = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(max.X, min.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMax.X, uvMin.Y));
+            var c = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(max.X, max.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMax.X, uvMax.Y));
+            var d = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(min.X, max.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMin.X, uvMax.Y));
+
+            _vertices.Add(a);
+            _vertices.Add(b);
+            _vertices.Add(c);
+
+            _vertices.Add(a);
+            _vertices.Add(c);
+            _vertices.Add(d);
+        }
+
+        public RenderData GetRenderData()
         {
             return new RenderData
             {

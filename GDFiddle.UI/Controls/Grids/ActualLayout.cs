@@ -1,6 +1,8 @@
-﻿namespace GDFiddle.UI.Controls.Grids
+﻿using System.Runtime.CompilerServices;
+
+namespace GDFiddle.UI.Controls.Grids
 {
-    public struct ActualLayout
+    public readonly struct ActualLayout
     {
         public float Offset { get; }
         public float Size { get; }
@@ -9,6 +11,12 @@
         {
             Offset = offset;
             Size = size;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Contains(float position)
+        {
+            return Offset <= position && Offset + Size > position;
         }
     }
 }
