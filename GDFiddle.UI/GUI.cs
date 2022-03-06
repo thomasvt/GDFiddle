@@ -5,13 +5,13 @@ namespace GDFiddle.UI
 {
     public class GUI
     {
-        private readonly Font _defaultFont;
+        public readonly Font Font;
         private readonly GrowingArray<VertexPositionColorTexture> _vertices;
         private readonly GrowingArray<RenderCommand> _renderCommands;
 
-        public GUI(Font defaultFont)
+        public GUI(Font font)
         {
-            _defaultFont = defaultFont;
+            Font = font;
             _vertices = new GrowingArray<VertexPositionColorTexture>(500);
             _renderCommands = new GrowingArray<RenderCommand>(50);
         }
@@ -51,7 +51,7 @@ namespace GDFiddle.UI
 
             // Note: rendertarget Y+ is up, while texture Y+ (and most 2D graphics) is down.
 
-            font ??= _defaultFont;
+            font ??= Font;
             var startVertexIdx = _vertices.Index;
             var previousCharCode = (ushort)0;
             for (var i = 0; i < text.Length; i++)
@@ -69,7 +69,7 @@ namespace GDFiddle.UI
                 x += glyph.XAdvance + font.GetKerningDistance(previousCharCode, code);
                 previousCharCode = code;
             }
-            _renderCommands.Add(new RenderCommand(startVertexIdx, (_vertices.Index - startVertexIdx) / 3, font.Filename));
+            _renderCommands.Add(new RenderCommand(startVertexIdx, (_vertices.Index - startVertexIdx) / 3, font.TextureFilename));
         }
 
         public RenderData ProduceRenderData()

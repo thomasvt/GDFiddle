@@ -7,15 +7,15 @@ namespace GDFiddle.UI
 
     public class Font
     {
-        public string Filename { get; }
+        public string TextureFilename { get; }
         internal readonly int LineHeight;
         internal readonly int Base;
         internal readonly Dictionary<int, Glyph> Glyphs;
         private readonly Dictionary<uint, int> _kernings; // kerning-distance by First+Second charcode combined into uint.
 
-        internal Font(string filename, int lineHeight, int @base, List<Glyph> glyphs, List<Kerning> kernings)
+        internal Font(string textureFilename, int lineHeight, int @base, List<Glyph> glyphs, List<Kerning> kernings)
         {
-            Filename = filename;
+            TextureFilename = textureFilename;
             LineHeight = lineHeight;
             Base = @base;
             Glyphs = glyphs.ToDictionary(g => g.Code);
@@ -68,16 +68,15 @@ namespace GDFiddle.UI
             }
         }
 
-        public static Font FromBMFontFile(string pngFile)
+        public static Font FromBMFontFile(string pngFile, string fntFile)
         {
-            var xmlFile = Path.GetFileNameWithoutExtension(pngFile) + ".fnt";
             if (!File.Exists(pngFile))
                 throw new FileNotFoundException($"Font file '{pngFile}' not found.");
-            if (!File.Exists(xmlFile))
-                throw new FileNotFoundException($"Font file should have an accompanying xml-file '{xmlFile}'. Did you use BMFont to generate?");
+            if (!File.Exists(fntFile))
+                throw new FileNotFoundException($"Font file should have an accompanying fnt-file '{fntFile}'. Did you use BMFont to generate?");
 
-            if (new XmlSerializer(typeof(font)).Deserialize(File.OpenRead(xmlFile)) is not font fontDefinition)
-                throw new Exception($"File '{xmlFile}' is not valid. Did you use BMFont to generate?");
+            if (new XmlSerializer(typeof(font)).Deserialize(File.OpenRead(fntFile)) is not font fontDefinition)
+                throw new Exception($"File '{fntFile}' is not valid. Did you use BMFont to generate?");
 
             var common = fontDefinition.Items.OfType<fontCommon>().First();
             var @base = int.Parse(common.@base);
