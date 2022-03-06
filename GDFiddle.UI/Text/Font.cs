@@ -1,7 +1,8 @@
-﻿using System.Xml.Serialization;
+﻿using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using Microsoft.Xna.Framework;
 
-namespace GDFiddle.UI
+namespace GDFiddle.UI.Text
 {
     // how to render: http://www.angelcode.com/products/bmfont/doc/render_text.html
 
@@ -22,50 +23,13 @@ namespace GDFiddle.UI
             _kernings = kernings.ToDictionary(k => (uint)(k.First << 16) | k.Second, k => k.Amount);
         }
 
-        internal int GetKerningDistance(ushort first, ushort second)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal int GetKerningOffset(ushort first, ushort second)
         {
             var mask = (uint) (first << 16) | second;
             return _kernings.TryGetValue(mask, out var distance) 
                 ? distance 
                 : 0;
-        }
-
-        internal readonly struct Glyph
-        {
-            public readonly int Code;
-            public readonly Vector2 UVMin;
-            public readonly Vector2 UVMax;
-            public readonly int Width;
-            public readonly int Heigth;
-            public readonly int XOffset;
-            public readonly int YOffset;
-            public readonly int XAdvance;
-
-            public Glyph(int code, Vector2 uvMin, Vector2 uvMax, int width, int heigth, int xOffset, int yOffset, int xAdvance)
-            {
-                Code = code;
-                UVMin = uvMin;
-                UVMax = uvMax;
-                Width = width;
-                Heigth = heigth;
-                XOffset = xOffset;
-                YOffset = yOffset;
-                XAdvance = xAdvance;
-            }
-        }
-
-        internal readonly struct Kerning
-        {
-            public readonly ushort First;
-            public readonly ushort Second;
-            public readonly int Amount;
-
-            public Kerning(ushort first, ushort second, int amount)
-            {
-                First = first;
-                Second = second;
-                Amount = amount;
-            }
         }
 
         public static Font FromBMFontFile(string pngFile, string fntFile)
@@ -132,6 +96,51 @@ namespace GDFiddle.UI
             }
 
             return glyphs;
+        }
+
+        public IEnumerable<GlyphInfo> GetTextGlyphs(int x, int y, string text)
+        {
+            // how to render text:  http://www.angelcode.com/products/bmfont/doc/render_text.html
+
+            var previousCharCode = (ushort)0;
+            for (var i = 0; i < text.Length; i++)
+            {
+                var code = (ushort)char.ConvertToUtf32(text, i);
+                if (!Glyphs.TryGetValue(code, out var glyph))
+                {
+                    if (!Glyphs.TryGetValue('?', out glyph))
+                        continue;
+                }
+
+                var min = new Vector2(x + glyph.XOffset, y + glyph.YOffset);
+                var max = min + new Vector2(glyph.Width, glyph.Heigth);
+                yield return new GlyphInfo(min, max, glyph.UVMin, glyph.UVMax);
+
+                x += glyph.XAdvance + GetKerningOffset(previousCharCode, code);
+
+                previousCharCode = code;
+            }
+        }
+
+        public Vector2 Measure(string text)
+        {
+            var width = 0;
+            var previousCharCode = (ushort)0;
+            for (var i = 0; i < text.Length; i++)
+            {
+                var code = (ushort)char.ConvertToUtf32(text, i);
+                if (!Glyphs.TryGetValue(code, out var glyph))
+                {
+                    if (!Glyphs.TryGetValue('?', out glyph))
+                        continue;
+                }
+
+                width += glyph.XAdvance + GetKerningOffset(previousCharCode, code);
+
+                previousCharCode = code;
+            }
+
+            return new Vector2(width, LineHeight);
         }
     }
 }

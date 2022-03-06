@@ -1,4 +1,6 @@
 ﻿using GDFiddle.UI;
+using GDFiddle.UI.Controls;
+using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -23,7 +25,8 @@ namespace GDFiddle
             _gdm.PreferredBackBufferHeight = 900;
             _gdm.ApplyChanges();
 
-            _gui = new GUI(Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt"));
+            var defaultFont = Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt");
+            _gui = new GUI(defaultFont);
             
             base.Initialize();
         }
@@ -31,8 +34,9 @@ namespace GDFiddle
         protected override void LoadContent()
         {
             _effect = new BasicEffect(GraphicsDevice);
-            _fontTexture = Texture2D.FromFile(GraphicsDevice, _gui.Font.TextureFilename);
+            _fontTexture = Texture2D.FromFile(GraphicsDevice, _gui.DefaultFont.TextureFilename);
             ConvertGrayValueToTransparency(_fontTexture);
+            BuildGui();
         }
 
         private static void ConvertGrayValueToTransparency(Texture2D texture)
@@ -60,14 +64,19 @@ namespace GDFiddle
         {
             GraphicsDevice.Clear(new Color(10, 10, 10));
 
-            BuildGui();
+            
             var renderData = _gui.ProduceRenderData();
 
             _effect.World = Matrix.Identity;
-            _effect.Projection = Matrix.CreateOrthographic(GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0.1f, 5);
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
             _effect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), new Vector3(0, 0, 0), Vector3.UnitY);
             _effect.VertexColorEnabled = true;
             _effect.Texture = _fontTexture;
+            GraphicsDevice.RasterizerState = new RasterizerState
+            {
+                CullMode = CullMode.None,
+                ScissorTestEnable = true
+            };
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
@@ -75,6 +84,7 @@ namespace GDFiddle
 
             foreach (var command in renderData.RenderCommands)
             {
+                GraphicsDevice.ScissorRectangle = new Rectangle((int)command.Offset.X, (int)command.Offset.Y, (int)command.Size.X, (int)command.Size.Y);
                 _effect.TextureEnabled = command.Texture != null;
                 
                 GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderData.Vertices, command.VertexOffset, command.TriangleCount);
@@ -83,8 +93,7 @@ namespace GDFiddle
 
         private void BuildGui()
         {
-            _gui.BeginFrame();
-            _gui.DrawText(0,0, "Recent", Color.White);
+            _gui.Controls.Add(new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White});
         }
 
         protected override void Dispose(bool disposing)
