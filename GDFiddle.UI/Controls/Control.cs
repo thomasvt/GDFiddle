@@ -9,7 +9,8 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _parent;
         private GUI? _gui;
-
+        private Size _size;
+        
         public virtual void Render(Renderer renderer, Size size)
         {
             if (Background.HasValue)
@@ -23,7 +24,18 @@ namespace GDFiddle.UI.Controls
             return this;
         }
 
-        public virtual void Arrange(Size size)
+        public void RedoArrange()
+        {
+            Arrange(_size);
+        }
+
+        public void DoArrange(Size size)
+        {
+            _size = size;
+            Arrange(size);
+        }
+
+        protected virtual void Arrange(Size size)
         {
         }
 

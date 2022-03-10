@@ -8,6 +8,7 @@ namespace GDFiddle.UI.Controls.Grids
         private GridLength? _right;
         private float _startDragPosition;
         private float _startDragLeftSize;
+        private Grid? _grid;
 
         public GridSplitter()
         {
@@ -26,6 +27,7 @@ namespace GDFiddle.UI.Controls.Grids
 
         private void ConfigureGridSplitting(Grid grid)
         {
+            _grid = grid;
             var gridProperties = grid.Children.GetGridProperties(this);
             var splitterColumn = gridProperties.Column;
             if (splitterColumn <= 0 || splitterColumn >= grid.ColumnDefinitions.Count - 1)
@@ -63,6 +65,9 @@ namespace GDFiddle.UI.Controls.Grids
             if (_left == null || _right == null)
                 return;
 
+            if (newLeftSize == _left.ActualLayout.Size)
+                return;
+
             var delta = newLeftSize - _left.ActualLayout.Size;
             // if these are Stars, this is ok: we just use as many starts as there are pixels. This way we get pixel-perfect control over their sizes without removing the dynamic proportioning when the grid gets resized etc. (idea comes from WPF)
             _left.Amount = _left.ActualLayout.Size + delta;
@@ -71,6 +76,8 @@ namespace GDFiddle.UI.Controls.Grids
             _right.Amount = _right.ActualLayout.Size - delta; 
             if (_right.Amount < _right.MinLength)
                 _right.Amount = _right.MinLength;
+
+            _grid.RedoArrange();
         }
     }
 }

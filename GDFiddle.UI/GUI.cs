@@ -25,7 +25,7 @@ namespace GDFiddle.UI
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
-            Root?.Arrange(viewArea.Size);
+            Root?.DoArrange(viewArea.Size);
             ProcessMouse(viewArea, mousePosition, mouseWentDown, mouseWentUp);
         }
 
@@ -33,7 +33,6 @@ namespace GDFiddle.UI
         {
             if (_mouseCapturer != null)
             {
-                // todo when draging splitter outside window, it doesnt resize all the way to the edge of the window.
                 LetControlProcessMouse(_mouseCapturer, mousePosition, mouseWentDown, mouseWentUp);
                 _previousMousePosition = mousePosition;
                 return;

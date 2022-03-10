@@ -25,6 +25,15 @@ namespace GDFiddle
             _gui = new GUI(defaultFont);
             _gdm = new GraphicsDeviceManager(this);
             IsMouseVisible = true;
+            Window.AllowUserResizing = true;
+            Window.ClientSizeChanged += OnResize;
+        }
+
+        private void OnResize(object? sender, EventArgs e)
+        {
+            _gdm.PreferredBackBufferWidth = Window.ClientBounds.Width;
+            _gdm.PreferredBackBufferHeight = Window.ClientBounds.Height;
+            _gdm.ApplyChanges();
         }
 
         protected override void Initialize()
