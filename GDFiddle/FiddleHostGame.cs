@@ -77,9 +77,7 @@ namespace GDFiddle
         private void Render(RenderData renderCommands)
         {
             _effect!.World = Matrix.Identity;
-            _effect.Projection =
-                Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f,
-                    5);
+            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
             _effect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), new Vector3(0, 0, 0), Vector3.UnitY);
             _effect.VertexColorEnabled = true;
             GraphicsDevice.RasterizerState = new RasterizerState
