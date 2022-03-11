@@ -1,8 +1,6 @@
 ﻿using System.Drawing;
 using System.Numerics;
 using GDFiddle.UI.Controls;
-using GDFiddle.UI.Controls.Grids;
-using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -15,12 +13,10 @@ namespace GDFiddle.UI
         private Control? _mouseCapturer;
         private Vector2 _previousMousePosition;
         private Control? _root;
-        public Font DefaultFont { get; }
 
-        public GUI(Font defaultFont)
+        public GUI(Renderer renderer)
         {
-            DefaultFont = defaultFont;
-            _renderer = new Renderer(DefaultFont);
+            _renderer = renderer;
         }
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)

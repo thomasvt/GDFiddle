@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GDFiddle.Ecs\GDFiddle.Ecs.csproj" />
     <ProjectReference Include="..\GDFiddle.UI\GDFiddle.UI.csproj" />
   </ItemGroup>
 
