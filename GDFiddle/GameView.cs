@@ -8,28 +8,45 @@ namespace GDFiddle
     internal class GameView : Control
     {
         private readonly GraphicsDevice _graphicsDevice;
-        private readonly FiddleGame _game;
         private RenderTarget2D? _renderTarget;
 
-        public GameView(GraphicsDevice graphicsDevice, FiddleGame _game)
+        public GameView(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
-            this._game = _game;
         }
 
-        public override void Render(Renderer renderer, Size size)
+        public override void Render(GuiRenderer guiRenderer, Size size)
+        {
+            base.Render(guiRenderer, size);
+            var gameFrame = RenderGame(size);
+            guiRenderer.Draw(gameFrame);
+        }
+        
+        /// <summary>
+        /// Renders the current game frame to a texture.
+        /// </summary>
+        private Texture2D RenderGame(Size size)
+        {
+            var renderTarget = PrepareRenderTarget(size);
+            _graphicsDevice.SetRenderTarget(renderTarget);
+            Game?.RenderSystem.Render();
+            _graphicsDevice.SetRenderTarget(null);
+            return renderTarget;
+        }
+
+        /// <summary>
+        /// Reuses the existing RenderTarget in videoram, or prepares a new one if the <see cref="GameView"/>'s size has changed.
+        /// </summary>
+        private RenderTarget2D PrepareRenderTarget(Size size)
         {
             if (_renderTarget == null || _renderTarget.Width != size.Width || _renderTarget.Height != size.Height)
             {
                 _renderTarget?.Dispose();
                 _renderTarget = new RenderTarget2D(_graphicsDevice, size.Width, size.Height);
             }
-
-            base.Render(renderer, size);
-            _graphicsDevice.SetRenderTarget(_renderTarget);
-            _game.Draw();
-            _graphicsDevice.SetRenderTarget(null);
-            renderer.Draw(_renderTarget);
+            return _renderTarget;
         }
+
+        public GDFiddleGame? Game { get; set; }
     }
 }

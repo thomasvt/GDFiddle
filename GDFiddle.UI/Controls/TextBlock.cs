@@ -5,10 +5,10 @@ namespace GDFiddle.UI.Controls
 {
     public class TextBlock : Control
     {
-        public override void Render(Renderer renderer, Size size)
+        public override void Render(GuiRenderer guiRenderer, Size size)
         {
-            base.Render(renderer, size);
-            renderer.DrawText(0,0, Text, Foreground);
+            base.Render(guiRenderer, size);
+            guiRenderer.DrawText(0,0, Text, Foreground);
         }
 
         public string Text { get; set; } = "";

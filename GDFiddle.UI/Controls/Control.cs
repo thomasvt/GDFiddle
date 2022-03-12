@@ -11,11 +11,11 @@ namespace GDFiddle.UI.Controls
         private GUI? _gui;
         private Size _size;
         
-        public virtual void Render(Renderer renderer, Size size)
+        public virtual void Render(GuiRenderer guiRenderer, Size size)
         {
             if (Background.HasValue)
             {
-                renderer.FillRectangle(new Vector2(0, 0), new Vector2(size.Width, size.Height), Background.Value);
+                guiRenderer.FillRectangle(new Vector2(0, 0), new Vector2(size.Width, size.Height), Background.Value);
             }
         }
 

@@ -1,21 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\GDFiddle.Ecs\GDFiddle.Ecs.csproj" />
     <ProjectReference Include="..\GDFiddle.Framework\GDFiddle.Framework.csproj" />
-    <ProjectReference Include="..\GDFiddle.UI\GDFiddle.UI.csproj" />
-    <ProjectReference Include="..\TestGame\TestGame.csproj" />
   </ItemGroup>
 
 </Project>

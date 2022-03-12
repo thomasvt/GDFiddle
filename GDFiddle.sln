@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDFiddle.UI", "GDFiddle.UI\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDFiddle.Ecs", "GDFiddle.Ecs\GDFiddle.Ecs.csproj", "{96F33162-4CFB-4C80-9934-5D6C918E9BC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDFiddle.Framework", "GDFiddle.Framework\GDFiddle.Framework.csproj", "{73D3B413-FE3C-4F6F-931A-2F8D5490B16E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestGame", "TestGame\TestGame.csproj", "{45479CD2-D044-4ECF-9A4C-712B30600CF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{96F33162-4CFB-4C80-9934-5D6C918E9BC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{96F33162-4CFB-4C80-9934-5D6C918E9BC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{96F33162-4CFB-4C80-9934-5D6C918E9BC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73D3B413-FE3C-4F6F-931A-2F8D5490B16E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73D3B413-FE3C-4F6F-931A-2F8D5490B16E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73D3B413-FE3C-4F6F-931A-2F8D5490B16E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73D3B413-FE3C-4F6F-931A-2F8D5490B16E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{45479CD2-D044-4ECF-9A4C-712B30600CF4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45479CD2-D044-4ECF-9A4C-712B30600CF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45479CD2-D044-4ECF-9A4C-712B30600CF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45479CD2-D044-4ECF-9A4C-712B30600CF4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

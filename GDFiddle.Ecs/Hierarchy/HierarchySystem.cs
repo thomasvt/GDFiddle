@@ -6,14 +6,14 @@
     /// </summary>
     public abstract class HierarchySystem<TMessage> : IDisposable where TMessage : struct
     {
-        protected readonly IEcsScene EcsScene;
+        protected readonly IScene Scene;
         private readonly Dictionary<EntityId, EntityId> _parentPerChild;
         private readonly Dictionary<EntityId, ChildList> _childListPerParent;
 
-        protected HierarchySystem(IEcsScene ecsScene)
+        protected HierarchySystem(IScene scene)
         {
-            EcsScene = ecsScene;
-            EcsScene.RegisterComponentRemoveCallback((EntityId entityid, ref ParentComponent parentComponent) => RemoveChildrenFromScene(entityid));
+            Scene = scene;
+            Scene.RegisterComponentRemoveCallback((EntityId entityid, ref ParentComponent parentComponent) => RemoveChildrenFromScene(entityid));
             _parentPerChild = new Dictionary<EntityId, EntityId>();
             _childListPerParent = new Dictionary<EntityId, ChildList>();
         }
@@ -27,7 +27,7 @@
             for (var i = 0; i < childList.Count; i++)
             {
                 var childId = childList.ChildIds[i];
-                EcsScene.Remove(childId); // will cause recursion if some children also have ParentComponent.
+                Scene.Remove(childId); // will cause recursion if some children also have ParentComponent.
                 _parentPerChild.Remove(childId);
             }
             // clear this parent's data:
@@ -53,8 +53,8 @@
                 childList.Add(childId);
             }
 
-            if (!EcsScene.HasComponent<ParentComponent>(parentId))
-                EcsScene.AddComponent<ParentComponent>(parentId);
+            if (!Scene.HasComponent<ParentComponent>(parentId))
+                Scene.AddComponent<ParentComponent>(parentId);
             _parentPerChild.Add(childId, parentId);
 
             NotifyChildInternal(childId, initializeMessage);
@@ -81,7 +81,7 @@
                 // no longer a parent.
                 childList.Dispose();
                 _childListPerParent.Remove(parentId);
-                EcsScene.RemoveComponent<ParentComponent>(parentId);
+                Scene.RemoveComponent<ParentComponent>(parentId);
             }
 
             NotifyChildInternal(childId, uninitializeMessage);

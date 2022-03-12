@@ -7,7 +7,7 @@ using Rectangle = System.Drawing.Rectangle;
 
 namespace GDFiddle.UI
 {
-    public class Renderer
+    public class GuiRenderer
     {
         private readonly GraphicsDevice _graphicsDevice;
         public readonly Font Font;
@@ -20,7 +20,7 @@ namespace GDFiddle.UI
 
         private readonly Texture2D _fontTexture;
 
-        public Renderer(GraphicsDevice graphicsDevice, Font font)
+        public GuiRenderer(GraphicsDevice graphicsDevice, Font font)
         {
             _graphicsDevice = graphicsDevice;
             Font = font;

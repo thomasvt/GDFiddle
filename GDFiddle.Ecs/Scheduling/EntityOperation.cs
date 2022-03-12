@@ -2,14 +2,14 @@
 {
     internal abstract class EntityOperation
     {
-        public abstract void Execute(EcsScene sceneManager);
+        public abstract void Execute(Scene sceneManager);
     }
 
     internal class EntityOperation<TComponent> : EntityOperation where TComponent : struct
     {
         public EntityId EntityId;
         public EntityOperationType Type;
-        public override void Execute(EcsScene sceneManager)
+        public override void Execute(Scene sceneManager)
         {
             switch (Type)
             {

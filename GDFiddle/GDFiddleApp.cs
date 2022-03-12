@@ -1,4 +1,5 @@
 ﻿using GDFiddle.Ecs;
+using GDFiddle.Games;
 using GDFiddle.UI;
 using GDFiddle.UI.Controls;
 using GDFiddle.UI.Controls.Grids;
@@ -6,23 +7,26 @@ using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using TestGame;
 using Color = Microsoft.Xna.Framework.Color;
 using Rectangle = System.Drawing.Rectangle;
 using Vector2 = System.Numerics.Vector2;
 
 namespace GDFiddle
 {
-    internal class FiddleHostGame : Game
+    internal class GDFiddleApp : Game
     {
         private readonly GraphicsDeviceManager _gdm;
-        private GUI _gui;
+        private GUI? _gui;
         private BasicEffect? _effect;
         private MouseState _previousMouseState;
-        private FiddleGame _game;
+        private readonly Scene _scene;
+        private GameView _gameView;
 
-        public FiddleHostGame()
+        public GDFiddleApp(int maxArchetypeCount)
         {
             _gdm = new GraphicsDeviceManager(this);
+            _scene = new Scene(new EcsConfig { InitialEntityCapacity = 100, MaxArchetypeCount = maxArchetypeCount });
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
@@ -41,16 +45,18 @@ namespace GDFiddle
             _gdm.PreferredBackBufferHeight = 900;
             _gdm.ApplyChanges();
 
-            _gui = new GUI(new Renderer(GraphicsDevice, Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt")));
-            _game = new FiddleGame(GraphicsDevice);
+            _effect = new BasicEffect(GraphicsDevice);
+
+            CreateEditorGui();
+            CreateGame();
 
             base.Initialize();
         }
 
-        protected override void LoadContent()
+        private void CreateGame()
         {
-            _effect = new BasicEffect(GraphicsDevice);
-            BuildGui();
+            var game = new GameBuilder(GraphicsDevice).Build(typeof(StartTestGame).Assembly);
+            _gameView.Game = game;
         }
 
         protected override void Update(GameTime gameTime)
@@ -60,8 +66,10 @@ namespace GDFiddle
             var mousePosition = new Vector2(mouseState.X, mouseState.Y);
             var mouseWentDown = mouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
             var mouseWentUp = mouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
-            _game.Update(new Time((float)gameTime.TotalGameTime.TotalSeconds, (float)gameTime.ElapsedGameTime.TotalSeconds));
-            _gui.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
+
+            var time = new Time((float) gameTime.TotalGameTime.TotalSeconds, (float) gameTime.ElapsedGameTime.TotalSeconds);
+            _scene.Tick(time);
+            _gui!.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
             Mouse.SetCursor(_gui.MouseCursor);
             _previousMouseState = mouseState;
         }
@@ -70,7 +78,7 @@ namespace GDFiddle
         {
             GraphicsDevice.Clear(new Color(10, 10, 10));
 
-            var renderCommands = _gui.Render(GetViewArea());
+            var renderCommands = _gui!.Render(GetViewArea());
             Render(renderCommands);
         }
 
@@ -116,24 +124,28 @@ namespace GDFiddle
             return viewArea;
         }
 
-        private void BuildGui()
+        private void CreateEditorGui()
         {
-            _gui.Root = new Grid
-            {
-                ColumnDefinitions = { GridLength.Star(3), GridLength.Pixels(3), GridLength.Star() },
-                Children = {
-                    { new GameView(GraphicsDevice, _game) { Background = new Color(66, 66, 80) }, new GridProperties { Row = 0, Column = 0 } },
+            _gameView = new GameView(GraphicsDevice) { Background = new Color(66, 66, 80) };
+            _gui = new GUI(new GuiRenderer(GraphicsDevice, Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt")))
+                {
+                    Root = new Grid
                     {
-                        new Grid {
-                            Background = new Color(51, 51, 61),
-                            Children = {
-                                { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 0, Row = 0 } }
-                            }
-                        }, new GridProperties { Column = 2, Row = 0 }
-                    },
-                    { new GridSplitter { Background = new Color(58,58, 70) }, new GridProperties { Column = 1, Row = 0 } }
-                }
-            };
+                        ColumnDefinitions = { GridLength.Star(3), GridLength.Pixels(3), GridLength.Star() },
+                        Children = {
+                            { _gameView, new GridProperties {Row = 0, Column = 0} },
+                            {
+                                new Grid {
+                                    Background = new Color(51, 51, 61),
+                                    Children = {
+                                        { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 0, Row = 0 } }
+                                    }
+                                }, new GridProperties { Column = 2, Row = 0 }
+                            },
+                            { new GridSplitter { Background = new Color(58,58, 70) }, new GridProperties { Column = 1, Row = 0 } }
+                        }
+                    }
+                };
         }
 
         protected override void Dispose(bool disposing)

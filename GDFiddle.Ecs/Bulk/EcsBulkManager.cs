@@ -4,9 +4,9 @@ namespace GDFiddle.Ecs.Bulk
 {
     internal class EcsBulkManager : IEcsBulkManager
     {
-        private readonly EcsScene _sceneManager;
+        private readonly Scene _sceneManager;
 
-        public EcsBulkManager(EcsScene sceneManager)
+        public EcsBulkManager(Scene sceneManager)
         {
             _sceneManager = sceneManager;
         }

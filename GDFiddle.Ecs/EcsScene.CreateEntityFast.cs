@@ -2,7 +2,7 @@
 
 namespace GDFiddle.Ecs;
 
-public partial class EcsScene
+public partial class Scene
 {
     /// <summary>
     /// Combines creating an archetype, entity and settings its component value in one. It's also faster than using separate steps.

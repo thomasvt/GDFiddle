@@ -2,5 +2,5 @@
 
 using GDFiddle;
 
-var game = new FiddleHostGame();
+var game = new GDFiddleApp(256);
 game.Run();

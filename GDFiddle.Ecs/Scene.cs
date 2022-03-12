@@ -9,8 +9,8 @@ namespace GDFiddle.Ecs
     /// <summary>
     /// The main accesspoint to all ECS functionality. Use the sub-managers in the properties for specialized functionality such as scheduling, bulk operations and querying.
     /// </summary>
-    public partial class EcsScene
-    : IEcsScene
+    public partial class Scene
+    : IScene
     {
         public const int MaxComponentTypeCount = 64;
 
@@ -27,7 +27,7 @@ namespace GDFiddle.Ecs
         private readonly Dictionary<byte, object> _componentRemoveCallbacks;
         private ulong _componentRemoveCallbackMask;
 
-        public EcsScene(EcsConfig config)
+        public Scene(EcsConfig config)
         {
             _config = config;
             _componentRemoveCallbacks = new Dictionary<byte, object>(MaxComponentTypeCount);
@@ -242,14 +242,14 @@ namespace GDFiddle.Ecs
                 throw new Exception($"You cannot do this while visiting Query results. Schedule your action using {nameof(AfterFrame)}.");
             if (_creationTheadId != Thread.CurrentThread.ManagedThreadId)
                 throw new NotMainThreadException(
-                    $"Only call this method on the same thread as where {nameof(EcsScene)} was constructed. Use {nameof(AfterFrame)} for scheduling options.");
+                    $"Only call this method on the same thread as where {nameof(Scene)} was constructed. Use {nameof(AfterFrame)} for scheduling options.");
         }
 
         internal void ThrowIfNotMainThread()
         {
             if (_creationTheadId != Thread.CurrentThread.ManagedThreadId)
                 throw new NotMainThreadException(
-                    $"Only call this method on the same thread as where {nameof(EcsScene)} was constructed. Use {nameof(AfterFrame)} for scheduling options.");
+                    $"Only call this method on the same thread as where {nameof(Scene)} was constructed. Use {nameof(AfterFrame)} for scheduling options.");
         }
 
         public IEcsQueryManager Querying => _querying;

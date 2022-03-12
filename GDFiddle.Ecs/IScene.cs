@@ -8,7 +8,7 @@ namespace GDFiddle.Ecs
     /// <summary>
     /// The entry point to all ECS functionality. Use subobjects Hierarchy, Querying and AtFrameEnd for more specific functionality.
     /// </summary>
-    public interface IEcsScene
+    public interface IScene
     {
         EntityId CreateEntity(Archetype archetype);
         /// <summary>

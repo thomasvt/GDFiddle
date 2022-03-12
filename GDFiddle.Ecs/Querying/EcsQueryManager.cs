@@ -9,7 +9,7 @@ namespace GDFiddle.Ecs.Querying
         private readonly int _creationTheadId;
         internal bool IsQueryInProgress;
 
-        internal EcsQueryManager(EcsScene scene)
+        internal EcsQueryManager(Scene scene)
         {
             _componentRegistry = scene.ComponentRegistry;
             _pools = scene.Pools;

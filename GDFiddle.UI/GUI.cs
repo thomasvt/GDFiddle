@@ -8,15 +8,15 @@ namespace GDFiddle.UI
 {
     public class GUI
     {
-        private readonly Renderer _renderer;
+        private readonly GuiRenderer _guiRenderer;
         private Control? _mouseOverControl;
         private Control? _mouseCapturer;
         private Vector2 _previousMousePosition;
         private Control? _root;
 
-        public GUI(Renderer renderer)
+        public GUI(GuiRenderer guiRenderer)
         {
-            _renderer = renderer;
+            _guiRenderer = guiRenderer;
         }
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
@@ -62,9 +62,9 @@ namespace GDFiddle.UI
 
         public RenderData Render(Rectangle viewArea)
         {
-            _renderer.BeginFrame(viewArea);
-            Root?.Render(_renderer, viewArea.Size);
-            return _renderer.GetRenderData();
+            _guiRenderer.BeginFrame(viewArea);
+            Root?.Render(_guiRenderer, viewArea.Size);
+            return _guiRenderer.GetRenderData();
         }
 
         public void CaptureMouse(Control capturer)

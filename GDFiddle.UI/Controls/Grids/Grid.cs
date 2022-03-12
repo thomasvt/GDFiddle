@@ -29,16 +29,16 @@ namespace GDFiddle.UI.Controls.Grids
             }
         }
 
-        public override void Render(Renderer renderer, Size size)
+        public override void Render(GuiRenderer guiRenderer, Size size)
         {
-            base.Render(renderer, size);
+            base.Render(guiRenderer, size);
             foreach (var child in Children)
             {
                 var horizontalActual = _columnDistributor.GetActualLayout(child.GridProperties.Column);
                 var verticalActual = _rowDistributor.GetActualLayout(child.GridProperties.Row);
                 var subArea = new Rectangle((int)horizontalActual.Offset, (int)verticalActual.Offset, (int)horizontalActual.Size, (int)verticalActual.Size);
-                using var scope = renderer.CreateSubClipArea(subArea);
-                child.Control.Render(renderer, subArea.Size);
+                using var scope = guiRenderer.CreateSubClipArea(subArea);
+                child.Control.Render(guiRenderer, subArea.Size);
             }
         }
 

@@ -4,10 +4,10 @@ namespace GDFiddle.Ecs.Scheduling
 {
     internal class Scheduler : IScheduler
     {
-        private readonly EcsScene _sceneManager;
+        private readonly Scene _sceneManager;
         private readonly ConcurrentQueue<EntityOperation> _scheduledOperations;
 
-        public Scheduler(EcsScene sceneManager)
+        public Scheduler(Scene sceneManager)
         {
             _sceneManager = sceneManager;
             _scheduledOperations = new ConcurrentQueue<EntityOperation>();
