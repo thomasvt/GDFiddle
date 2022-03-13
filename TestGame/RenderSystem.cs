@@ -11,7 +11,7 @@ namespace TestGame
         private readonly IRenderer _renderer;
         private readonly EntityQuery<PositionComponent, SpriteComponent> _renderQuery;
 
-        public RenderSystem(IRenderer renderer, IScene scene)
+        public RenderSystem(IScene scene, IRenderer renderer)
         {
             _renderer = renderer;
             _renderQuery = scene.Querying.DefineQuery<PositionComponent, SpriteComponent>();
@@ -19,7 +19,7 @@ namespace TestGame
 
         public void Render()
         {
-            _renderer.BeginFrame();
+            _renderer.BeginFrame(GetViewTransform());
             _renderQuery.VisitAll((ids, positions, sprites) =>
             {
                 for (var i = 0; i < ids.Length; i++)
@@ -38,6 +38,7 @@ namespace TestGame
         public EntityId? GetEntityAt(Vector2 screenPosition)
         {
             EntityId? entityId = null;
+            var worldPosition = Vector2.Transform(screenPosition, GetViewInvTransform());
             _renderQuery.VisitAll((ids, positions, sprites) =>
             {
                 for (var i = 0; i < ids.Length; i++)
@@ -48,7 +49,7 @@ namespace TestGame
 
                     var origin = positions[i].Position;
                     var aabb = sprite.Aabb.Translate(origin);
-                    if (aabb.Contains(screenPosition))
+                    if (aabb.Contains(worldPosition))
                     {
                         entityId = ids[i];
                         return;
@@ -56,6 +57,16 @@ namespace TestGame
                 }
             });
             return entityId;
+        }
+
+        private Matrix3x2 GetViewTransform()
+        {
+            return Matrix3x2.CreateTranslation(_renderer.LastFrameSize * 0.5f);
+        }
+
+        private Matrix3x2 GetViewInvTransform()
+        {
+            return Matrix3x2.CreateTranslation(_renderer.LastFrameSize * -0.5f);
         }
     }
 }

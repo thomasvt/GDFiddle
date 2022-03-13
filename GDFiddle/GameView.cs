@@ -50,10 +50,11 @@ namespace GDFiddle
 
         public override void NotifyMouseDown(Vector2 mousePosition)
         {
-            if (Game == null)
-                return;
-
-            var entityId = Game.GetEntityAt(mousePosition);
+            var entityId = Game?.GetEntityAt(mousePosition);
+            if (entityId.HasValue)
+            {
+                // todo select entity
+            }
         }
 
         public GDFiddleGame? Game { get; set; }
