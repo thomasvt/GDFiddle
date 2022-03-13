@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using GDFiddle.UI;
 using GDFiddle.UI.Controls;
 using Microsoft.Xna.Framework.Graphics;
@@ -45,6 +46,14 @@ namespace GDFiddle
                 _renderTarget = new RenderTarget2D(_graphicsDevice, size.Width, size.Height);
             }
             return _renderTarget;
+        }
+
+        public override void NotifyMouseDown(Vector2 mousePosition)
+        {
+            if (Game == null)
+                return;
+
+            var entityId = Game.GetEntityAt(mousePosition);
         }
 
         public GDFiddleGame? Game { get; set; }

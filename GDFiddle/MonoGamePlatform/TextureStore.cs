@@ -1,9 +1,9 @@
-﻿using GDFiddle.Framework;
+﻿using System.Numerics;
 using GDFiddle.Framework.Graphics;
 using Microsoft.Xna.Framework.Graphics;
 using Texture = GDFiddle.Framework.Graphics.Texture;
 
-namespace GDFiddle
+namespace GDFiddle.MonoGamePlatform
 {
     internal class TextureStore : ITextureStore
     {
@@ -21,7 +21,8 @@ namespace GDFiddle
             var pathLower =  path.ToLower();
             if (!_textures.TryGetValue(pathLower, out var texture))
             {
-                texture = new Texture(Texture2D.FromFile(_graphicsDevice, path));
+                var platformTexture = Texture2D.FromFile(_graphicsDevice, path);
+                texture = new Texture(platformTexture, new Vector2(platformTexture.Width, platformTexture.Height));
                 _textures.Add(pathLower, texture);
             }
             return texture;

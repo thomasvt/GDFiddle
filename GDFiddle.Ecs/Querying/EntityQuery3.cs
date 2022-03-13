@@ -15,41 +15,12 @@ namespace GDFiddle.Ecs.Querying
             _componentId3 = componentId3;
         }
 
-        public void VisitAll(EntityCallback3<TC1, TC2, TC3> action)
-        {
-            using (QueryManager.ClaimQueryLock(QueryMask))
-            {
-                foreach (var pool in GetApplicablePools())
-                {
-                    var itemCount = pool.Count;
-                    if (itemCount == 0)
-                        continue;
-
-                    var componentArray1 = (ComponentArray<TC1>)pool.ComponentArraysPerComponentId[_componentId1];
-                    var componentArray2 = (ComponentArray<TC2>)pool.ComponentArraysPerComponentId[_componentId2];
-                    var componentArray3 = (ComponentArray<TC3>)pool.ComponentArraysPerComponentId[_componentId3];
-
-                    if (RunInParallel && itemCount > 1)
-                    {
-                        Parallel.For(0, itemCount, i => action(pool.EntityIds[i], ref componentArray1.Records[i], ref componentArray2.Records[i], ref componentArray3.Records[i]));
-                    }
-                    else
-                    {
-                        for (var i = 0; i < itemCount; i++)
-                        {
-                            action(pool.EntityIds[i], ref componentArray1.Records[i], ref componentArray2.Records[i], ref componentArray3.Records[i]);
-                        }
-                    }
-                }
-            }
-        }
-
         /// <summary>
-        /// Fastest way to visit matching entities. The bulkAction will be called 0 or more times, each time receiving the requested components of another block of entities that match the query.
+        /// Visits all matching entities. Your bulkAction will be called 0 or more times, each time receiving the requested components of another block of entities that match the query.
         /// All Component-spans in one bulkAction call are guaranteed to have the same Length.
-        /// If RunInParallel is true, multiple blocks of entities are sent to bulkAction in parallel.
+        /// If RunInParallel is true, bulkAction is called for all matching entity blocks in parallel.
         /// </summary>
-        public void VisitAllBulk(EntityCallbackBulk3<TC1, TC2, TC3> bulkAction)
+        public void VisitAll(EntityCallbackBulk3<TC1, TC2, TC3> bulkAction)
         {
             using (QueryManager.ClaimQueryLock(QueryMask))
             {

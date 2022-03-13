@@ -1,4 +1,5 @@
-﻿namespace GDFiddle.Framework.Graphics
+﻿
+namespace GDFiddle.Framework.Graphics
 {
     public struct SpriteComponent
     {

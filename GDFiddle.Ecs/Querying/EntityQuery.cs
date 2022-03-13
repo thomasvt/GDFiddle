@@ -49,6 +49,9 @@ namespace GDFiddle.Ecs.Querying
             }
         } 
 
+        /// <summary>
+        /// Calls your processing code in parallel for all matching blocks of entities.
+        /// </summary>
         public bool RunInParallel { get; set; }
     }
 }

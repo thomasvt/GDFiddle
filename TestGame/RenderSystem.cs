@@ -1,31 +1,26 @@
-﻿using GDFiddle.Ecs;
+﻿using System.Numerics;
+using GDFiddle.Ecs;
 using GDFiddle.Ecs.Querying;
 using GDFiddle.Framework;
 using GDFiddle.Framework.Graphics;
 
 namespace TestGame
 {
-    public class RenderSystem : IRenderSystem, IInitialize
+    public class RenderSystem : IRenderSystem
     {
         private readonly IRenderer _renderer;
-        private readonly IScene _scene;
-        private EntityQuery<PositionComponent, SpriteComponent>? _renderQuery;
+        private readonly EntityQuery<PositionComponent, SpriteComponent> _renderQuery;
 
         public RenderSystem(IRenderer renderer, IScene scene)
         {
             _renderer = renderer;
-            _scene = scene;
-        }
-
-        public void Initialize()
-        {
-            _renderQuery = _scene.Querying.DefineQuery<PositionComponent, SpriteComponent>();
+            _renderQuery = scene.Querying.DefineQuery<PositionComponent, SpriteComponent>();
         }
 
         public void Render()
         {
             _renderer.BeginFrame();
-            _renderQuery!.VisitAllBulk((ids, positions, sprites) =>
+            _renderQuery.VisitAll((ids, positions, sprites) =>
             {
                 for (var i = 0; i < ids.Length; i++)
                 {
@@ -35,6 +30,32 @@ namespace TestGame
                 }
             });
             _renderer.EndFrame();
+        }
+
+        /// <summary>
+        /// Finds the entity at a certain screenposition (by its sprite). Return null if no entity is there.
+        /// </summary>
+        public EntityId? GetEntityAt(Vector2 screenPosition)
+        {
+            EntityId? entityId = null;
+            _renderQuery.VisitAll((ids, positions, sprites) =>
+            {
+                for (var i = 0; i < ids.Length; i++)
+                {
+                    var sprite = sprites[i].Sprite;
+                    if (sprite == null)
+                        continue;
+
+                    var origin = positions[i].Position;
+                    var aabb = sprite.Aabb.Translate(origin);
+                    if (aabb.Contains(screenPosition))
+                    {
+                        entityId = ids[i];
+                        return;
+                    }
+                }
+            });
+            return entityId;
         }
     }
 }

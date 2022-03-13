@@ -1,6 +1,8 @@
-﻿using GDFiddle.Ecs;
+﻿using System.Numerics;
+using GDFiddle.Ecs;
 using GDFiddle.Framework;
 using GDFiddle.Framework.Graphics;
+using GDFiddle.IoC;
 
 namespace GDFiddle
 {
@@ -9,32 +11,40 @@ namespace GDFiddle
     /// </summary>
     internal class GDFiddleGame
     {
-        private bool _initialized;
+        private readonly SingletonContainer _container;
+        private IRenderSystem _renderSystem;
+        private List<IUpdate> _updatables;
 
-        public GDFiddleGame(IRenderSystem renderSystem, IEnumerable<IInitialize> initializables, IEnumerable<IUpdate> updatables)
+        public GDFiddleGame(SingletonContainer container)
         {
-            RenderSystem = renderSystem;
-            Initializables = initializables.ToList();
-            Updatables = updatables.ToList();
+            _container = container;
+            Start();
         }
-
-        public IRenderSystem RenderSystem { get; }
-        public List<IInitialize> Initializables { get; }
-        public List<IUpdate> Updatables { get; }
 
         public void Render()
         {
-            RenderSystem.Render();
+            _renderSystem.Render();
+        }
+
+        public void Start()
+        {
+            _renderSystem = _container.ResolveAllWithBaseType<IRenderSystem>().Single();
+            var initializables = _container.ResolveAllWithBaseType<IInitialize>();
+            _updatables = _container.ResolveAllWithBaseType<IUpdate>().ToList();
+
+            // initialize game services:
+            foreach (var initializable in initializables)
+                initializable.Initialize();
         }
 
         public void Update(Time time)
         {
-            if (!_initialized)
-            {
-                Initializables.ForEach(i => i.Initialize());
-                _initialized = true;
-            }
-            Updatables.ForEach(u => u.Update(time));
+            _updatables.ForEach(u => u.Update(time));
+        }
+
+        public EntityId? GetEntityAt(Vector2 screenPosition)
+        {
+            return _renderSystem.GetEntityAt(screenPosition);
         }
     }
 }

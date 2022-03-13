@@ -3,6 +3,7 @@ using GDFiddle.Ecs;
 using GDFiddle.Framework;
 using GDFiddle.Framework.Graphics;
 using GDFiddle.IoC;
+using GDFiddle.MonoGamePlatform;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace GDFiddle.Games
@@ -20,12 +21,7 @@ namespace GDFiddle.Games
         {
             var container = BuildContainerWithFrameworkServices(ecsConfig);
             AddGameSpecificServices(container, gameAssemblies);
-
-            var renderSystem = container.ResolveAllWithBaseType<IRenderSystem>().Single();
-            var initializables = container.ResolveAllWithBaseType<IInitialize>();
-            var updatables = container.ResolveAllWithBaseType<IUpdate>();
-
-            return new GDFiddleGame(renderSystem, initializables, updatables);
+            return new GDFiddleGame(container);
         }
 
         private static void AddGameSpecificServices(SingletonContainer container, Assembly[] gameAssemblies)

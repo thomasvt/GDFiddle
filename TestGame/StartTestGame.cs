@@ -18,8 +18,9 @@ namespace TestGame
 
         public void Initialize()
         {
-            var sprite = new Sprite(_textureStore.GetTexture("hero.png"));
-            _scene.CreateEntity(id => new PositionComponent { Position = new Vector2(100, 100) }, id => new SpriteComponent { Sprite = sprite });
+            var texture = _textureStore.GetTexture("hero.png");
+            var sprite = new Sprite(texture, new Aabb(-texture.SizeTx * 0.5f, texture.SizeTx));
+            _scene.CreateEntity(id => new PositionComponent { Position = new Vector2(0, 0) }, id => new SpriteComponent { Sprite = sprite });
         }
     }
 }
