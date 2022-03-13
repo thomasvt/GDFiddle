@@ -30,7 +30,7 @@ namespace GDFiddle
 
         public void Draw(Sprite sprite, Vector2 position)
         {
-            _sb.Draw((Texture2D)sprite.Texture.InnerTexture, position.ToXna(), Color.White);
+            _sb.Draw((Texture2D)sprite.Texture.PlatformTexture, position.ToXna(), Color.White);
         }
     }
 }

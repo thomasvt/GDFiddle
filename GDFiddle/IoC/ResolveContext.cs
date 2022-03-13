@@ -3,24 +3,24 @@ namespace GDFiddle.IoC
 {
     public class ResolveContext
     {
-        private readonly Container _container;
+        private readonly SingletonContainer _singletonContainer;
         private readonly List<Type> _stack;
 
-        public ResolveContext(Container container)
+        public ResolveContext(SingletonContainer singletonContainer)
         {
-            _container = container;
+            _singletonContainer = singletonContainer;
             _stack = new List<Type>();
         }
 
-        private ResolveContext(Container container, IEnumerable<Type> other)
+        private ResolveContext(SingletonContainer singletonContainer, IEnumerable<Type> other)
         {
-            _container = container;
+            _singletonContainer = singletonContainer;
             _stack = new List<Type>(other);
         }
 
         internal ResolveContext Clone()
         {
-            return new ResolveContext(_container, _stack);
+            return new ResolveContext(_singletonContainer, _stack);
         }
 
         public T Resolve<T>()
@@ -28,13 +28,13 @@ namespace GDFiddle.IoC
             return (T) Resolve(typeof(T));
         }
 
-        internal object Resolve(Type type)
+        public object Resolve(Type type)
         {
             _stack.Add(type);
             if (_stack.Count(t => t == type) > 1)
                 throw new Exception($"Circular dependency detected while resolving \"{_stack.First().FullName}\" at dependency \"{type.FullName}\". Full chain: {string.Join(" -> ", _stack.Select(s => s.Name))}");
 
-            return _container.ResolveInternal(type, this);
+            return _singletonContainer.ResolveInternal(type, this);
         }
     }
 }

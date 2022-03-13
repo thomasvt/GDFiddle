@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GDFiddle.Ecs\GDFiddle.Ecs.csproj" />
+  </ItemGroup>
+
 </Project>

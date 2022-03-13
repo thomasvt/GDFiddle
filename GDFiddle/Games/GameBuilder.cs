@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
+using GDFiddle.Ecs;
 using GDFiddle.Framework;
 using GDFiddle.Framework.Graphics;
 using GDFiddle.IoC;
 using Microsoft.Xna.Framework.Graphics;
-using TestGame;
 
 namespace GDFiddle.Games
 {
@@ -16,30 +16,35 @@ namespace GDFiddle.Games
             _graphicsDevice = graphicsDevice;
         }
 
-        public GDFiddleGame Build(Assembly gameAssembly)
+        public GDFiddleGame Build(EcsConfig ecsConfig, params Assembly[] gameAssemblies)
         {
-            var types = gameAssembly.GetExportedTypes();
-            var container = BuildContainer(types);
+            var container = BuildContainerWithFrameworkServices(ecsConfig);
+            AddGameSpecificServices(container, gameAssemblies);
 
-            return new GDFiddleGame
-            {
-                RenderSystem = container.Resolve<RenderSystem>()
-            };
+            var renderSystem = container.ResolveAllWithBaseType<IRenderSystem>().Single();
+            var initializables = container.ResolveAllWithBaseType<IInitialize>();
+            var updatables = container.ResolveAllWithBaseType<IUpdate>();
+
+            return new GDFiddleGame(renderSystem, initializables, updatables);
         }
 
-        private Container BuildContainer(Type[] gameAssemblyTypes)
+        private static void AddGameSpecificServices(SingletonContainer container, Assembly[] gameAssemblies)
         {
-            var container = new Container();
+            var serviceTypes = gameAssemblies.SelectMany(a => a.GetExportedTypes()).Where(t => typeof(IService).IsAssignableFrom(t));
+            foreach (var serviceType in serviceTypes)
+            {
+                container.RegisterAsSelf(serviceType);
+            }
+        }
+
+        private SingletonContainer BuildContainerWithFrameworkServices(EcsConfig ecsConfig)
+        {
+            var container = new SingletonContainer();
             container.RegisterInstance(_graphicsDevice);
             container.Register<IRenderer, SpriteBatchRenderer>();
             container.Register<ITextureStore, TextureStore>();
-
-            container.Register<RenderSystem>();
-            var interfaces = typeof(StartTestGame).GetInterfaces();
-            if (interfaces.Contains(typeof(IInitialize))
-                container.Register<StartTestGame>();
-
-                container.Resolve<>()
+            container.RegisterInstance(ecsConfig);
+            container.Register<IScene, Scene>();
 
             return container;
         }

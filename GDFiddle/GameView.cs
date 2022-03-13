@@ -29,7 +29,7 @@ namespace GDFiddle
         {
             var renderTarget = PrepareRenderTarget(size);
             _graphicsDevice.SetRenderTarget(renderTarget);
-            Game?.RenderSystem.Render();
+            Game?.Render();
             _graphicsDevice.SetRenderTarget(null);
             return renderTarget;
         }

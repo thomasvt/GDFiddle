@@ -1,7 +1,6 @@
 ﻿using GDFiddle.Ecs.Bulk;
 using GDFiddle.Ecs.Querying;
 using GDFiddle.Ecs.Scheduling;
-using GDFiddle.Ecs.Systems;
 
 namespace GDFiddle.Ecs
 {
@@ -27,10 +26,6 @@ namespace GDFiddle.Ecs
         ref TComponent GetComponentRef<TComponent>(EntityId entityId) where TComponent : struct;
         bool HasComponent<TComponent>(EntityId entityId) where TComponent : struct;
         Archetype DefineArchetype();
-        /// <summary>
-        /// Performs some actions that must be done at the end of each frame: postponed entity-deletes, updating the hierarchical transformations.
-        /// </summary>
-        void Tick(Time time);
         void ClearScene();
         int EntityCount { get; }
         int ComponentCount { get; }
@@ -40,7 +35,6 @@ namespace GDFiddle.Ecs
         IEcsQueryManager Querying { get; }
         IEcsBulkManager Bulk { get; }
         IScheduler AfterFrame { get; }
-        IEcsSystemManager Systems { get; }
         Archetype GetArchetype(EntityId entityId);
         bool Exists(EntityId entityId);
         void SetComponent<TComponent>(EntityId entityId, in TComponent component) where TComponent : struct;
@@ -49,8 +43,6 @@ namespace GDFiddle.Ecs
         /// Registers a callback for when components of a specific type are removed. This gets triggered when an entity with a matching component is removed, or just the component is removed from an entity.
         /// </summary>
         void RegisterComponentRemoveCallback<TComponent>(EntityCallback1<TComponent> callback) where TComponent : struct;
-
-        void Initialize();
 
         /// <summary>
         /// Combines creating an archetype, entity and settings its component value in one. It's also faster than using separate steps.

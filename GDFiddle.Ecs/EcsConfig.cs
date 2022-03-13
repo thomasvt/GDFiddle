@@ -2,7 +2,7 @@
 {
     public class EcsConfig
     {
-        public int InitialEntityCapacity = 100;
+        public int InitialEntityCapacity = 4;
         public int MaxArchetypeCount = 32;
     }
 }

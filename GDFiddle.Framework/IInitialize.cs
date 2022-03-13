@@ -1,6 +1,6 @@
 ﻿namespace GDFiddle.Framework
 {
-    public interface IInitialize
+    public interface IInitialize : IService
     {
         void Initialize();
     }

@@ -20,13 +20,12 @@ namespace GDFiddle
         private GUI? _gui;
         private BasicEffect? _effect;
         private MouseState _previousMouseState;
-        private readonly Scene _scene;
         private GameView _gameView;
+        private GDFiddleGame _game;
 
-        public GDFiddleApp(int maxArchetypeCount)
+        public GDFiddleApp()
         {
             _gdm = new GraphicsDeviceManager(this);
-            _scene = new Scene(new EcsConfig { InitialEntityCapacity = 100, MaxArchetypeCount = maxArchetypeCount });
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
@@ -55,8 +54,9 @@ namespace GDFiddle
 
         private void CreateGame()
         {
-            var game = new GameBuilder(GraphicsDevice).Build(typeof(StartTestGame).Assembly);
-            _gameView.Game = game;
+            var config = new EcsConfig { InitialEntityCapacity = 100, MaxArchetypeCount = 64 };
+            _game = new GameBuilder(GraphicsDevice).Build(config, typeof(StartTestGame).Assembly);
+            _gameView.Game = _game;
         }
 
         protected override void Update(GameTime gameTime)
@@ -68,7 +68,7 @@ namespace GDFiddle
             var mouseWentUp = mouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
 
             var time = new Time((float) gameTime.TotalGameTime.TotalSeconds, (float) gameTime.ElapsedGameTime.TotalSeconds);
-            _scene.Tick(time);
+            _game?.Update(time);
             _gui!.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
             Mouse.SetCursor(_gui.MouseCursor);
             _previousMouseState = mouseState;

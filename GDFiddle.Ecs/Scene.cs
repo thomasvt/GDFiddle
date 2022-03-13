@@ -23,7 +23,6 @@ namespace GDFiddle.Ecs
         private readonly EcsQueryManager _querying;
         private readonly EcsBulkManager _bulk;
         private readonly Scheduler _afterFrame;
-        private readonly EcsSystemManager _systemManager;
         private readonly Dictionary<byte, object> _componentRemoveCallbacks;
         private ulong _componentRemoveCallbackMask;
 
@@ -39,7 +38,6 @@ namespace GDFiddle.Ecs
             _querying = new EcsQueryManager(this);
             _bulk = new EcsBulkManager(this);
             _afterFrame = new Scheduler(this);
-            _systemManager = new EcsSystemManager();
         }
 
         /// <summary>
@@ -149,11 +147,6 @@ namespace GDFiddle.Ecs
             componentArray.Records[entityIndexRecord.IdxInPool] = component;
         }
 
-        public void Initialize()
-        {
-            _systemManager.InitializeAll();
-        }
-
         public ref TComponent GetComponentRef<TComponent>(EntityId entityId) where TComponent : struct
         {
             var entityIndexRecord = EntityIndex.Records[entityId];
@@ -187,17 +180,6 @@ namespace GDFiddle.Ecs
         public Archetype DefineArchetype()
         {
             return new Archetype(ComponentRegistry);
-        }
-
-        public void Tick(Time time)
-        {
-            _systemManager.UpdateAll(time);
-            _afterFrame.ExecuteScheduledActions();
-        }
-
-        public string GetMemoryReport()
-        {
-            return "Cnt/Capacity [archetype]\r\n------------------------\r\n" + string.Join(Environment.NewLine, Pools.Where(pool => pool != null).Select(pool => pool.GetMemoryReport()));
         }
 
         /// <summary>
@@ -257,8 +239,6 @@ namespace GDFiddle.Ecs
         public IEcsBulkManager Bulk => _bulk;
 
         public IScheduler AfterFrame => _afterFrame;
-
-        public IEcsSystemManager Systems => _systemManager;
 
         public int EntityCount => EntityIndex.EntityCount;
         public int ComponentCount => ComponentRegistry.ComponentCount;
