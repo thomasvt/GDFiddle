@@ -17,6 +17,7 @@ namespace GDFiddle
         public GameView(GraphicsDevice graphicsDevice)
         {
             _graphicsDevice = graphicsDevice;
+            SelectionColor = new Color(250, 206, 50);
         }
 
         public override void Render(GuiRenderer guiRenderer, Size size)
@@ -32,7 +33,7 @@ namespace GDFiddle
             if (_selectedEntityId.HasValue && Game != null)
             {
                 var aabb = Game.GetEntityScreenAabb(_selectedEntityId.Value);
-                guiRenderer.DrawRectangle(aabb.TopLeft, aabb.Size, null, Color.Yellow);
+                guiRenderer.DrawRectangle(aabb.TopLeft, aabb.Size, null, SelectionColor);
             }
         }
 
@@ -67,5 +68,6 @@ namespace GDFiddle
         }
 
         public GDFiddleGame? Game { get; set; }
+        public Color SelectionColor { get; set; }
     }
 }
