@@ -10,4 +10,5 @@ public interface IRenderSystem : IService
 {
     void Render();
     EntityId? GetEntityAt(Vector2 screenPosition);
+    Aabb GetEntityScreenAabb(EntityId entityId);
 }

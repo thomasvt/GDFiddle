@@ -8,11 +8,13 @@ namespace TestGame
 {
     public class RenderSystem : IRenderSystem
     {
+        private readonly IScene _scene;
         private readonly IRenderer _renderer;
         private readonly EntityQuery<PositionComponent, SpriteComponent> _renderQuery;
 
         public RenderSystem(IScene scene, IRenderer renderer)
         {
+            _scene = scene;
             _renderer = renderer;
             _renderQuery = scene.Querying.DefineQuery<PositionComponent, SpriteComponent>();
         }
@@ -57,6 +59,16 @@ namespace TestGame
                 }
             });
             return entityId;
+        }
+
+        public Aabb GetEntityScreenAabb(EntityId entityId)
+        {
+            var position = _scene.GetComponentRef<PositionComponent>(entityId).Position;
+            var spriteAabb = _scene.GetComponentRef<SpriteComponent>(entityId).Sprite?.Aabb;
+            var aabbWorld = spriteAabb?.Translate(position) ?? new Aabb(position, Vector2.Zero);
+            var viewInv = GetViewTransform();
+            return new Aabb(Vector2.Transform(aabbWorld.TopLeft, viewInv), Vector2.TransformNormal(aabbWorld.Size, viewInv));
+
         }
 
         private Matrix3x2 GetViewTransform()

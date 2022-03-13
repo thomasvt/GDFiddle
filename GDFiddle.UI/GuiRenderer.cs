@@ -55,10 +55,33 @@ namespace GDFiddle.UI
             _clipAreaStack.Push(viewArea);
         }
 
-        public void FillRectangle(Vector2 topLeft, Vector2 size, Color color)
+        public void DrawRectangle(Vector2 topLeft, Vector2 size, Color? fillColor, Color? borderColor)
         {
             var startVertexIdx = _vertices.Index;
-            AppendQuad(topLeft, topLeft + size, Vector2.Zero, Vector2.Zero, color);
+            if (fillColor.HasValue)
+            {
+                _vertices.EnsureCapacity(6);
+                AppendQuad(topLeft, topLeft + size, Vector2.Zero, Vector2.Zero, fillColor.Value);
+            }
+
+            if (borderColor.HasValue)
+            {
+                _vertices.EnsureCapacity(6*4);
+                var left = topLeft.X + 0.5f;
+                var top = topLeft.Y + 0.5f;
+                var right = topLeft.X + size.X - 0.5f;
+                var bottom = topLeft.Y + size.Y - 0.5f;
+
+                var a = new Vector2(left, top);
+                var b = new Vector2(right, top);
+                var c = new Vector2(right, bottom);
+                var d = new Vector2(left, bottom);
+
+                AppendLine(a, b, 1f, borderColor.Value);
+                AppendLine(b, c, 1f, borderColor.Value);
+                AppendLine(c, d, 1f, borderColor.Value);
+                AppendLine(d, a, 1f, borderColor.Value);
+            }
             _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 
@@ -95,6 +118,30 @@ namespace GDFiddle.UI
             var b = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(max.X, min.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMax.X, uvMin.Y));
             var c = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(max.X, max.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMax.X, uvMax.Y));
             var d = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(min.X, max.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMin.X, uvMax.Y));
+
+            _vertices.Add(a);
+            _vertices.Add(b);
+            _vertices.Add(c);
+
+            _vertices.Add(a);
+            _vertices.Add(c);
+            _vertices.Add(d);
+        }
+
+        private void AppendLine(Vector2 v0, Vector2 v1, float thickness, Color color)
+        {
+            var longitudinalOffset = Vector2.Normalize(v1 - v0) * thickness * 0.5f;
+            var lateralOffset = new Vector2(-longitudinalOffset.Y, longitudinalOffset.X);
+
+            var vA = v0 - longitudinalOffset + lateralOffset;
+            var vB = v1 + longitudinalOffset + lateralOffset;
+            var vC = v1 + longitudinalOffset - lateralOffset;
+            var vD = v0 - longitudinalOffset - lateralOffset;
+
+            var a = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(vA.X, vA.Y, 0f), color, Microsoft.Xna.Framework.Vector2.Zero);
+            var b = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(vB.X, vB.Y, 0f), color, Microsoft.Xna.Framework.Vector2.Zero);
+            var c = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(vC.X, vC.Y, 0f), color, Microsoft.Xna.Framework.Vector2.Zero);
+            var d = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(vD.X, vD.Y, 0f), color, Microsoft.Xna.Framework.Vector2.Zero);
 
             _vertices.Add(a);
             _vertices.Add(b);

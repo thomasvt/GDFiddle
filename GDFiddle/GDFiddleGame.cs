@@ -46,5 +46,10 @@ namespace GDFiddle
         {
             return _renderSystem.GetEntityAt(screenPosition);
         }
+
+        public Aabb GetEntityScreenAabb(EntityId entityId)
+        {
+            return _renderSystem.GetEntityScreenAabb(entityId);
+        }
     }
 }

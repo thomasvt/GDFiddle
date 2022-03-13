@@ -15,7 +15,7 @@ namespace GDFiddle.UI.Controls
         {
             if (Background.HasValue)
             {
-                guiRenderer.FillRectangle(new Vector2(0, 0), new Vector2(size.Width, size.Height), Background.Value);
+                guiRenderer.DrawRectangle(new Vector2(0, 0), new Vector2(size.Width, size.Height), Background.Value, null);
             }
         }
 

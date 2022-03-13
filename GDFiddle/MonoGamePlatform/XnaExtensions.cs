@@ -2,6 +2,7 @@
 using GDFiddle.Framework;
 using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
+using Vector3 = Microsoft.Xna.Framework.Vector3;
 
 namespace GDFiddle.MonoGamePlatform
 {
@@ -28,6 +29,11 @@ namespace GDFiddle.MonoGamePlatform
         public static Vector2 ToXna(this System.Numerics.Vector2 v)
         {
             return new Vector2(v.X, v.Y);
+        }
+
+        public static Vector3 ToXna(this System.Numerics.Vector2 v, float z)
+        {
+            return new Vector3(v.X, v.Y, z);
         }
     }
 }
