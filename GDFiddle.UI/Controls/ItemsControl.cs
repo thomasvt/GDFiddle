@@ -3,6 +3,9 @@ using System.Numerics;
 
 namespace GDFiddle.UI.Controls
 {
+    /// <summary>
+    /// A control containing a list of child controls.
+    /// </summary>
     public class ItemsControl : Control
     {
         public ItemsControl()

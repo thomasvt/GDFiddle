@@ -3,6 +3,9 @@ using System.Numerics;
 
 namespace GDFiddle.UI.Controls
 {
+    /// <summary>
+    /// A control containing a single child, taking the entire size available to the ContentControl.
+    /// </summary>
     public class ContentControl : Control
     {
         private Control? _content;

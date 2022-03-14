@@ -1,5 +1,4 @@
 ﻿using GDFiddle.UI.Controls;
-using Microsoft.Xna.Framework;
 
 namespace GDFiddle.Editor
 {

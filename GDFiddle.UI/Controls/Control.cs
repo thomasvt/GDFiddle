@@ -5,6 +5,9 @@ using Vector2 = System.Numerics.Vector2;
 
 namespace GDFiddle.UI.Controls
 {
+    /// <summary>
+    /// The lowest baseclass for UI controls.
+    /// </summary>
     public abstract class Control
     {
         private Control? _parent;
@@ -28,7 +31,7 @@ namespace GDFiddle.UI.Controls
         }
         
         /// <summary>
-        /// Makes the control arrange itself (and children). Returns the size that it actually needs, which can be smaller or larger.
+        /// Makes the control arrange itself (and its children). Returns the size that it actually needs, which can be smaller or larger than the size provided by its parent.
         /// </summary>
         public Size DoArrange(Size size)
         {
