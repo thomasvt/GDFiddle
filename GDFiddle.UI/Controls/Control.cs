@@ -9,7 +9,10 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _parent;
         private GUI? _gui;
-        private Size _size;
+        /// <summary>
+        /// Size appointed by latest DoArrange call.
+        /// </summary>
+        public Size ActualSize { get; private set; }
         
         public virtual void Render(GuiRenderer guiRenderer, Size size)
         {
@@ -23,20 +26,19 @@ namespace GDFiddle.UI.Controls
         {
             return this;
         }
-
-        public void RedoArrange()
+        
+        /// <summary>
+        /// Makes the control arrange itself (and children). Returns the size that it actually needs, which can be smaller or larger.
+        /// </summary>
+        public Size DoArrange(Size size)
         {
-            Arrange(_size);
+             ActualSize = Arrange(size);
+             return ActualSize;
         }
 
-        public void DoArrange(Size size)
+        protected virtual Size Arrange(Size size)
         {
-            _size = size;
-            Arrange(size);
-        }
-
-        protected virtual void Arrange(Size size)
-        {
+            return size;
         }
 
         public virtual void NotifyMouseDown(Vector2 mousePosition)

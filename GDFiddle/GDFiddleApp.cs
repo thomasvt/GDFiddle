@@ -1,4 +1,6 @@
 ﻿using GDFiddle.Ecs;
+using GDFiddle.Editor;
+using GDFiddle.Framework.Messaging;
 using GDFiddle.Games;
 using GDFiddle.MonoGamePlatform;
 using GDFiddle.UI;
@@ -20,13 +22,15 @@ namespace GDFiddle
         private readonly GraphicsDeviceManager _gdm;
         private GUI? _gui;
         private BasicEffect? _effect;
+        private readonly IMessageBus _messageBus;
         private MouseState _previousMouseState;
-        private GameView _gameView;
         private GDFiddleGame _game;
+        private EditorShell _editorShell;
 
         public GDFiddleApp()
         {
             _gdm = new GraphicsDeviceManager(this);
+            _messageBus = new MessageBus();
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
@@ -57,7 +61,7 @@ namespace GDFiddle
         {
             var config = new EcsConfig { InitialEntityCapacity = 100, MaxArchetypeCount = 64 };
             _game = new GameBuilder(GraphicsDevice).Build(config, typeof(StartTestGame).Assembly);
-            _gameView.Game = _game;
+            _messageBus.Publish(new GameOpened(_game));
         }
 
         protected override void Update(GameTime gameTime)
@@ -127,26 +131,11 @@ namespace GDFiddle
 
         private void CreateEditorGui()
         {
-            _gameView = new GameView(GraphicsDevice) { Background = new Color(66, 66, 80) };
-            _gui = new GUI(new GuiRenderer(GraphicsDevice, Font.FromBMFontFile("SegoeUI14_0.png", "SegoeUI14.fnt")))
-                {
-                    Root = new Grid
-                    {
-                        ColumnDefinitions = { GridLength.Star(3), GridLength.Pixels(3), GridLength.Star() },
-                        Children = {
-                            { _gameView, new GridProperties {Row = 0, Column = 0} },
-                            {
-                                new Grid {
-                                    Background = new Color(51, 51, 61),
-                                    Children = {
-                                        { new TextBlock { Text = "The quick brown fox jumps over the lazy dog!", Foreground = Color.White }, new GridProperties { Column = 0, Row = 0 } }
-                                    }
-                                }, new GridProperties { Column = 2, Row = 0 }
-                            },
-                            { new GridSplitter { Background = new Color(58,58, 70) }, new GridProperties { Column = 1, Row = 0 } }
-                        }
-                    }
-                };
+            var font = Font.FromBMFontFile(GraphicsDevice, "SegoeUI14_0.png", "SegoeUI14.fnt");
+            _gui = new GUI(new GuiRenderer(), font)
+            {
+                Root = new EditorShell(GraphicsDevice, _messageBus)
+            };
         }
 
         protected override void Dispose(bool disposing)

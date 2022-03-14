@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Numerics;
 using GDFiddle.UI.Controls;
+using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Rectangle = System.Drawing.Rectangle;
 
@@ -14,9 +15,10 @@ namespace GDFiddle.UI
         private Vector2 _previousMousePosition;
         private Control? _root;
 
-        public GUI(GuiRenderer guiRenderer)
+        public GUI(GuiRenderer guiRenderer, Font defaultFont)
         {
             _guiRenderer = guiRenderer;
+            DefaultFont = defaultFont;
         }
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
@@ -101,5 +103,7 @@ namespace GDFiddle.UI
         /// Defines what the mouse cursor currently should look like.
         /// </summary>
         public MouseCursor MouseCursor { get; set; } = MouseCursor.Arrow;
+
+        public Font DefaultFont { get; }
     }
 }

@@ -1,6 +1,9 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
+using Microsoft.Xna.Framework.Graphics;
+using Color = Microsoft.Xna.Framework.Color;
+using Vector2 = System.Numerics.Vector2;
 
 namespace GDFiddle.UI.Text
 {
@@ -8,15 +11,16 @@ namespace GDFiddle.UI.Text
 
     public class Font
     {
-        public string TextureFilename { get; }
+        public object PlatformTexture { get; set; }
+
         internal readonly int LineHeight;
         internal readonly int Base;
         internal readonly Dictionary<int, Glyph> Glyphs;
         private readonly Dictionary<uint, int> _kernings; // kerning-distance by First+Second charcode combined into uint.
 
-        internal Font(string textureFilename, int lineHeight, int @base, List<Glyph> glyphs, List<Kerning> kernings)
+        internal Font(object platformTexture, int lineHeight, int @base, List<Glyph> glyphs, List<Kerning> kernings)
         {
-            TextureFilename = textureFilename;
+            PlatformTexture = platformTexture;
             LineHeight = lineHeight;
             Base = @base;
             Glyphs = glyphs.ToDictionary(g => g.Code);
@@ -32,7 +36,7 @@ namespace GDFiddle.UI.Text
                 : 0;
         }
 
-        public static Font FromBMFontFile(string pngFile, string fntFile)
+        public static Font FromBMFontFile(GraphicsDevice graphicsDevice, string pngFile, string fntFile)
         {
             if (!File.Exists(pngFile))
                 throw new FileNotFoundException($"Font file '{pngFile}' not found.");
@@ -51,7 +55,26 @@ namespace GDFiddle.UI.Text
             var glyphs = ParseGlyphs(fontDefinition, atlasWidth, atlasHeight);
             var kernings = ParseKernings(fontDefinition);
 
-            return new Font(pngFile, lineHeight, @base, glyphs, kernings);
+            var texture = ConvertGrayValueToTransparency(Texture2D.FromFile(graphicsDevice, pngFile));
+
+            return new Font(texture, lineHeight, @base, glyphs, kernings);
+        }
+
+        private static Texture2D ConvertGrayValueToTransparency(Texture2D texture)
+        {
+            var pixels = new Color[texture.Width * texture.Height];
+            texture.GetData(pixels);
+            for (var i = 0; i < pixels.Length; i++)
+            {
+                ref var c = ref pixels[i];
+                c.A = c.R;
+                c.R = 255;
+                c.G = 255;
+                c.B = 255;
+            }
+
+            texture.SetData(pixels);
+            return texture;
         }
 
         private static List<Kerning> ParseKernings(font fontDefinition)
@@ -122,7 +145,7 @@ namespace GDFiddle.UI.Text
             }
         }
 
-        public Vector2 Measure(string text)
+        public Size Measure(string text)
         {
             var width = 0;
             var previousCharCode = (ushort)0;
@@ -140,7 +163,7 @@ namespace GDFiddle.UI.Text
                 previousCharCode = code;
             }
 
-            return new Vector2(width, LineHeight);
+            return new Size(width, LineHeight);
         }
     }
 }

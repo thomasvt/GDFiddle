@@ -16,7 +16,7 @@ namespace GDFiddle.UI.Controls.Grids
             _rowDistributor = new GridPartSizeCalculator();
         }
 
-        protected override void Arrange(Size size)
+        protected override Size Arrange(Size size)
         {
             _columnDistributor.CalculatePartSizes(size.Width);
             _rowDistributor.CalculatePartSizes(size.Height);
@@ -27,6 +27,8 @@ namespace GDFiddle.UI.Controls.Grids
                 var verticalActual = _rowDistributor.GetActualLayout(child.GridProperties.Row);
                 child.Control.DoArrange(new Size((int) horizontalActual.Size, (int) verticalActual.Size));
             }
+
+            return size;
         }
 
         public override void Render(GuiRenderer guiRenderer, Size size)
@@ -37,7 +39,7 @@ namespace GDFiddle.UI.Controls.Grids
                 var horizontalActual = _columnDistributor.GetActualLayout(child.GridProperties.Column);
                 var verticalActual = _rowDistributor.GetActualLayout(child.GridProperties.Row);
                 var subArea = new Rectangle((int)horizontalActual.Offset, (int)verticalActual.Offset, (int)horizontalActual.Size, (int)verticalActual.Size);
-                using var scope = guiRenderer.CreateSubClipArea(subArea);
+                using var scope = guiRenderer.PushSubArea(subArea);
                 child.Control.Render(guiRenderer, subArea.Size);
             }
         }

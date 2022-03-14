@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Numerics;
 using GDFiddle.Ecs;
+using GDFiddle.Framework.Messaging;
 using GDFiddle.UI;
 using GDFiddle.UI.Controls;
 using Microsoft.Xna.Framework.Graphics;
@@ -8,16 +9,25 @@ using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDFiddle
 {
-    internal class GameView : Control
+    internal class GameView : Control, IDisposable
     {
         private readonly GraphicsDevice _graphicsDevice;
+        private readonly IMessageBus _messageBus;
         private RenderTarget2D? _renderTarget;
         private EntityId? _selectedEntityId;
 
-        public GameView(GraphicsDevice graphicsDevice)
+        public GameView(GraphicsDevice graphicsDevice, IMessageBus messageBus)
         {
             _graphicsDevice = graphicsDevice;
+            _messageBus = messageBus;
             SelectionColor = new Color(250, 206, 50);
+
+            SubscribeMessageHandlers();
+        }
+
+        private void SubscribeMessageHandlers()
+        {
+            _messageBus.Subscribe<GameOpened>(opened => Game = opened.Game);
         }
 
         public override void Render(GuiRenderer guiRenderer, Size size)
@@ -64,10 +74,22 @@ namespace GDFiddle
 
         public override void NotifyMouseDown(Vector2 mousePosition)
         {
-            _selectedEntityId = Game?.GetEntityAt(mousePosition);
+            Select(Game?.GetEntityAt(mousePosition));
+        }
+
+        private void Select(EntityId? entityId)
+        {
+            _selectedEntityId = entityId;
+            _messageBus.Publish(new EntitySelected(_selectedEntityId));
+        }
+
+        public void Dispose()
+        {
+            _renderTarget?.Dispose();
         }
 
         public GDFiddleGame? Game { get; set; }
+
         public Color SelectionColor { get; set; }
     }
 }
