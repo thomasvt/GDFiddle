@@ -4,8 +4,6 @@ using GDFiddle.Framework.Messaging;
 using GDFiddle.Games;
 using GDFiddle.MonoGamePlatform;
 using GDFiddle.UI;
-using GDFiddle.UI.Controls;
-using GDFiddle.UI.Controls.Grids;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

@@ -1,4 +1,5 @@
-﻿using GDFiddle.Ecs.Bulk;
+﻿using System.Collections;
+using GDFiddle.Ecs.Bulk;
 using GDFiddle.Ecs.Querying;
 using GDFiddle.Ecs.Scheduling;
 
@@ -68,5 +69,10 @@ namespace GDFiddle.Ecs
         /// Combines creating an archetype, entity and settings its component value in one. It's also faster than using separate steps.
         /// </summary>
         EntityId CreateEntity<TC1, TC2, TC3, TC4, TC5>(in Func<EntityId, TC1> c1, in Func<EntityId, TC2> c2, in Func<EntityId, TC3> c3, in Func<EntityId, TC4> c4, in Func<EntityId, TC5> c5) where TC1 : struct where TC2 : struct where TC3 : struct where TC4 : struct where TC5 : struct;
+
+        /// <summary>
+        /// Returns all components of the given entity as objects. For inspection purposes.
+        /// </summary>
+        IEnumerable GetComponents(EntityId entityId);
     }
 }

@@ -1,24 +1,68 @@
-﻿using GDFiddle.UI.Controls;
+﻿using System.Drawing;
+using GDFiddle.Ecs;
+using GDFiddle.Framework.Messaging;
+using GDFiddle.UI;
+using GDFiddle.UI.Controls;
+using Color = Microsoft.Xna.Framework.Color;
 
 namespace GDFiddle.Editor
 {
     internal class PropertiesPanel : ContentControl
     {
-        public PropertiesPanel()
+        private IScene? _scene;
+        private Dictionary<Type, List<ComponentField>> _fieldsPerComponentType;
+        private EntityId? _entityId;
+
+        public PropertiesPanel(IMessageBus messageBus)
         {
-            Content = new ItemsControl
+            _fieldsPerComponentType = new Dictionary<Type, List<ComponentField>>(64);
+            Content = new ItemsControl();
+            ConfigureMessages(messageBus);
+        }
+
+        private void ConfigureMessages(IMessageBus messageBus)
+        {
+            messageBus.Subscribe<EntitySelected>(e => EntityId = e.EntityId);
+            messageBus.Subscribe<GameOpened>(e => _scene = e.Game.Scene);
+        }
+
+        public override void Render(GuiRenderer guiRenderer, Size size)
+        {
+            base.Render(guiRenderer, size);
+        }
+
+        public EntityId? EntityId
+        {
+            get => _entityId;
+            set
             {
-                Items =
+                _entityId = value;
+                BuildPropertyList(value);
+            }
+        }
+
+        private void BuildPropertyList(EntityId? entityId)
+        {
+            var itemsControl = Content as ItemsControl;
+            itemsControl!.Items.Clear();
+
+            if (!entityId.HasValue || _scene == null)
+                return;
+
+            foreach (var component in _scene.GetComponents(entityId.Value))
+            {
+                var type = component.GetType();
+                if (!_fieldsPerComponentType.TryGetValue(type, out var propertyList))
                 {
-                    new TextBlock { Text = "Hello world" },
-                    new TextBlock { Text = "Hello world 2" },
-                    new TextBlock { Text = "Hello world 3" },
-                    new TextBlock { Text = "Hello world 4" },
-                    new TextBlock { Text = "Hello world 5" },
-                    new TextBlock { Text = "Hello world 6" },
-                    new TextBlock { Text = "Hello world 7" }
+                    propertyList = type.GetFields().Select(f => new ComponentField(f.Name, f.GetValue)).ToList();
                 }
-            };
+
+                itemsControl.Items.Add(new TextBlock { Text = component.GetType().Name, Foreground = Color.Gray });
+                foreach (var properties in propertyList)
+                {
+                    itemsControl.Items.Add(new TextBlock { Text = $"{properties.Label} = {properties.GetValue(component)?.ToString() ?? "<null>"}"});
+                }
+            }
         }
     }
 }

@@ -13,6 +13,7 @@
         public abstract void Grow(int capacity);
 
         public abstract void TriggerCallback(object callback, EntityId entityId, int idx);
+        public abstract object GetByIdx(int index);
     }
 
     internal class ComponentArray<T>
@@ -61,6 +62,11 @@
         public override void TriggerCallback(object callback, EntityId entityId, int idx)
         {
             ((EntityCallback1<T>)callback).Invoke(entityId, ref Records[idx]);
+        }
+
+        public override object GetByIdx(int index)
+        {
+            return Records[index];
         }
     }
 }

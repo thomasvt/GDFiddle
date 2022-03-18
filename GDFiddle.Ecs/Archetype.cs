@@ -65,20 +65,15 @@ namespace GDFiddle.Ecs
 
         public int ComponentCount => BitOperations.PopCount(Mask);
 
-        public byte[] GetComponentIds()
+        public IEnumerable<byte> GetComponentIds()
         {
-            var popCount = BitOperations.PopCount(Mask);
-            var componentIds = new byte[popCount];
-            var idx = 0;
             var mask = Mask;
-            for (byte i = 0; i < 32; i++)
+            for (byte i = 0; i < 64; i++)
             {
                 if ((mask & 1ul) != 0)
-                    componentIds[idx++] = i;
+                    yield return i;
                 mask >>= 1;
             }
-
-            return componentIds;
         }
 
         public IEnumerable<ComponentDefinition> GetComponentDefinitions()

@@ -1,4 +1,5 @@
-﻿using GDFiddle.Ecs.Bulk;
+﻿using System.Collections;
+using GDFiddle.Ecs.Bulk;
 using GDFiddle.Ecs.ComponentStore;
 using GDFiddle.Ecs.Querying;
 using GDFiddle.Ecs.Scheduling;
@@ -94,6 +95,17 @@ namespace GDFiddle.Ecs
             if (!_componentRemoveCallbacks.TryAdd(componentId, callback))
                 throw new Exception("Only 1 callback per component type can be registered.");
             _componentRemoveCallbackMask |= 1ul << componentId;
+        }
+
+        public IEnumerable GetComponents(EntityId entityId)
+        {
+            var entityIndexRecord = EntityIndex.Records[entityId];
+            var pool = Pools[entityIndexRecord.PoolIdx];
+            foreach (var componentId in pool.Archetype.GetComponentIds())
+            {
+                var componentArray = pool.ComponentArraysPerComponentId[componentId];
+                yield return componentArray.GetByIdx(entityIndexRecord.IdxInPool);
+            }
         }
 
         public void AddComponent<TComponent>(EntityId entityId) where TComponent : struct

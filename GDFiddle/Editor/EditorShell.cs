@@ -1,4 +1,5 @@
-﻿using GDFiddle.Framework.Messaging;
+﻿using GDFiddle.Ecs;
+using GDFiddle.Framework.Messaging;
 using GDFiddle.UI.Controls;
 using GDFiddle.UI.Controls.Grids;
 using Microsoft.Xna.Framework;
@@ -16,7 +17,7 @@ namespace GDFiddle.Editor
                 Children =
                 {
                     { new GameView(graphicsDevice, messageBus) { Background = new Color(66, 66, 80) }, new GridProperties {Row = 0, Column = 0}},
-                    { new SidePanel(), new GridProperties {Column = 2, Row = 0}},
+                    { new SidePanel(messageBus), new GridProperties {Column = 2, Row = 0}},
                     { new GridSplitter {Background = new Color(58, 58, 70)}, new GridProperties {Column = 1, Row = 0}}
                 }
             };

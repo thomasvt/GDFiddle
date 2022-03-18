@@ -19,6 +19,11 @@ namespace GDFiddle.UI.Controls
             control.Parent = _owner;
         }
 
+        public void Clear()
+        {
+            _items.Clear();
+        }
+
         public IEnumerator<Control> GetEnumerator()
         {
             return _items.GetEnumerator();

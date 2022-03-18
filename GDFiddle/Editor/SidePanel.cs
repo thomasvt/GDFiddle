@@ -1,4 +1,5 @@
-﻿using GDFiddle.UI.Controls;
+﻿using GDFiddle.Framework.Messaging;
+using GDFiddle.UI.Controls;
 using GDFiddle.UI.Controls.Grids;
 using Microsoft.Xna.Framework;
 
@@ -6,7 +7,7 @@ namespace GDFiddle.Editor
 {
     public class SidePanel : ContentControl
     {
-        public SidePanel()
+        public SidePanel(IMessageBus messageBus)
         {
             Content = new Grid
             {
@@ -14,7 +15,7 @@ namespace GDFiddle.Editor
                 Children =
                 {
                     {
-                        new PropertiesPanel(),
+                        new PropertiesPanel(messageBus),
                         new GridProperties {Column = 0, Row = 0}
                     }
                 }

@@ -51,5 +51,7 @@ namespace GDFiddle
         {
             return _renderSystem.GetEntityScreenAabb(entityId);
         }
+
+        public IScene Scene => _container.Resolve<IScene>();
     }
 }
