@@ -10,7 +10,7 @@ namespace GDFiddle.Editor
     internal class PropertiesPanel : ContentControl
     {
         private IScene? _scene;
-        private Dictionary<Type, List<ComponentField>> _fieldsPerComponentType;
+        private readonly Dictionary<Type, List<ComponentField>> _fieldsPerComponentType;
         private EntityId? _entityId;
 
         public PropertiesPanel(IMessageBus messageBus)
@@ -25,12 +25,7 @@ namespace GDFiddle.Editor
             messageBus.Subscribe<EntitySelected>(e => EntityId = e.EntityId);
             messageBus.Subscribe<GameOpened>(e => _scene = e.Game.Scene);
         }
-
-        public override void Render(GuiRenderer guiRenderer, Size size)
-        {
-            base.Render(guiRenderer, size);
-        }
-
+        
         public EntityId? EntityId
         {
             get => _entityId;
@@ -55,12 +50,13 @@ namespace GDFiddle.Editor
                 if (!_fieldsPerComponentType.TryGetValue(type, out var propertyList))
                 {
                     propertyList = type.GetFields().Select(f => new ComponentField(f.Name, f.GetValue)).ToList();
+                    _fieldsPerComponentType.Add(type, propertyList);
                 }
 
                 itemsControl.Items.Add(new TextBlock { Text = component.GetType().Name, Foreground = Color.Gray });
-                foreach (var properties in propertyList)
+                foreach (var property in propertyList)
                 {
-                    itemsControl.Items.Add(new TextBlock { Text = $"{properties.Label} = {properties.GetValue(component)?.ToString() ?? "<null>"}"});
+                    itemsControl.Items.Add(new LiveProperty(property.Label, () => property.GetValue(component)));
                 }
             }
         }

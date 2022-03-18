@@ -12,6 +12,7 @@ namespace GDFiddle.UI.Text
     public class Font
     {
         public object PlatformTexture { get; set; }
+        public int RowHeight => LineHeight;
 
         internal readonly int LineHeight;
         internal readonly int Base;
