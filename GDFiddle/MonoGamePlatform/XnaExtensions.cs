@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using GDFiddle.Framework;
+using GDFiddle.UI;
 using Microsoft.Xna.Framework;
 using Vector2 = Microsoft.Xna.Framework.Vector2;
 using Vector3 = Microsoft.Xna.Framework.Vector3;
@@ -8,9 +9,9 @@ namespace GDFiddle.MonoGamePlatform
 {
     internal static class XnaExtensions
     {
-        public static Rectangle ToXna(this System.Drawing.RectangleF r)
+        public static Rectangle ToXna(this RectangleF r)
         {
-            return new Rectangle((int)r.X, (int)r.Y, (int)r.Width, (int)r.Height);
+            return new Rectangle((int)r.Location.X, (int)r.Location.Y, (int)r.Size.X, (int)r.Size.Y);
         }
 
         public static Rectangle ToXna(this Aabb aabb)

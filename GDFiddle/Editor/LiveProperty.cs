@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using GDFiddle.UI;
 using GDFiddle.UI.Controls;
 using GDFiddle.UI.Text;
@@ -12,7 +13,7 @@ namespace GDFiddle.Editor
     internal class LiveProperty : Control
     {
         public readonly string Label;
-        public readonly Func<object> ValueGetter;
+        public readonly Func<object?> ValueGetter;
 
         public LiveProperty(string label, Func<object?> valueGetter)
         {
@@ -20,16 +21,16 @@ namespace GDFiddle.Editor
             ValueGetter = valueGetter;
         }
 
-        protected override Size Arrange(Size size)
+        protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
-            return new Size(size.Width, (Font ?? GUI!.DefaultFont).RowHeight);
+            return new Vector2(parentAvailableSize.X, (Font ?? GUI!.DefaultFont).RowHeight);
         }
 
-        public override void Render(GuiRenderer guiRenderer, Size size)
+        public override void Render(GuiRenderer guiRenderer)
         {
-            base.Render(guiRenderer, size);
+            base.Render(guiRenderer);
             guiRenderer.DrawText(0,0, Label, LabelColor, GUI!.DefaultFont);
-            guiRenderer.DrawText(size.Width * 4 / 10, 0, ValueGetter()?.ToString() ?? "<null>", LabelColor, Font ?? GUI!.DefaultFont);
+            guiRenderer.DrawText(ArrangedSize.X * 4 / 10, 0, ValueGetter()?.ToString() ?? "<null>", LabelColor, Font ?? GUI!.DefaultFont);
         }
 
         public Color LabelColor { get; set; } = Color.White;

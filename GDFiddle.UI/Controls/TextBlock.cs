@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using GDFiddle.UI.Text;
 using Color = Microsoft.Xna.Framework.Color;
 
@@ -6,13 +7,13 @@ namespace GDFiddle.UI.Controls
 {
     public class TextBlock : Control
     {
-        public override void Render(GuiRenderer guiRenderer, Size size)
+        public override void Render(GuiRenderer guiRenderer)
         {
-            base.Render(guiRenderer, size);
+            base.Render(guiRenderer);
             guiRenderer.DrawText(0,0, Text, Foreground, Font ?? GUI!.DefaultFont);
         }
 
-        protected override Size Arrange(Size size)
+        protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
             return (Font ?? GUI!.DefaultFont).Measure(Text);
         }

@@ -23,7 +23,7 @@ namespace GDFiddle.UI
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
-            Root?.DoArrange(viewArea.Size);
+            Root?.DoArrange(new RectangleF(viewArea.X, viewArea.Y, viewArea.Width, viewArea.Height));
             ProcessMouse(viewArea, mousePosition, mouseWentDown, mouseWentUp);
         }
 
@@ -64,8 +64,8 @@ namespace GDFiddle.UI
 
         public RenderData Render(Rectangle viewArea)
         {
-            _guiRenderer.BeginFrame(viewArea);
-            Root?.Render(_guiRenderer, viewArea.Size);
+            _guiRenderer.BeginFrame(new RectangleF(viewArea.X, viewArea.Y, viewArea.Width, viewArea.Height));
+            Root?.Render(_guiRenderer);
             return _guiRenderer.GetRenderData();
         }
 

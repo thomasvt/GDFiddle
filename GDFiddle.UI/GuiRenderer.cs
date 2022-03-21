@@ -23,7 +23,7 @@ namespace GDFiddle.UI
             _clipAreaStack = new Stack<RectangleF>();
         }
 
-        public void BeginFrame(Rectangle viewArea)
+        public void BeginFrame(RectangleF viewArea)
         {
             _vertices.Clear();
             _renderCommands.Clear();
@@ -61,10 +61,10 @@ namespace GDFiddle.UI
             _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 
-        public void DrawText(int x, int y, string text, Color color, Font font)
+        public void DrawText(float x, float y, string text, Color color, Font font)
         {
             var startVertexIdx = _vertices.Index;
-            foreach (var glyphInfo in font.GetTextGlyphs(x, y, text))
+            foreach (var glyphInfo in font.GetTextGlyphs((int)x, (int)y, text))
             {
                 AppendQuad(glyphInfo.QuadMin, glyphInfo.QuadMax, glyphInfo.UVMin, glyphInfo.UVMax, color);
             }
@@ -136,7 +136,7 @@ namespace GDFiddle.UI
         public IDisposable PushSubArea(RectangleF subArea)
         {
             var parentArea = _clipAreaStack.Peek();
-            _clipAreaStack.Push(new RectangleF(parentArea.X + subArea.X, parentArea.Y + subArea.Y, subArea.Width, subArea.Height));
+            _clipAreaStack.Push(new RectangleF(parentArea.Location.X + subArea.Location.X, parentArea.Location.Y + subArea.Location.Y, subArea.Size.X, subArea.Size.Y));
             return new AreaScope(_clipAreaStack);
         }
 

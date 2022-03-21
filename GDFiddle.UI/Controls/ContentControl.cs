@@ -15,14 +15,14 @@ namespace GDFiddle.UI.Controls
             return Content?.GetControlAt(position);
         }
 
-        protected override Size Arrange(Size size)
+        protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
-            return Content?.DoArrange(size) ?? new Size(0, 0);
+            return Content?.DoArrange(new RectangleF(Vector2.Zero, parentAvailableSize)) ?? Vector2.Zero;
         }
 
-        public override void Render(GuiRenderer guiRenderer, Size size)
+        public override void Render(GuiRenderer guiRenderer)
         {
-            Content?.Render(guiRenderer, size);
+            Content?.Render(guiRenderer);
         }
 
         public Control? Content

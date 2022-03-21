@@ -146,7 +146,7 @@ namespace GDFiddle.UI.Text
             }
         }
 
-        public Size Measure(string text)
+        public Vector2 Measure(string text)
         {
             var width = 0;
             var previousCharCode = (ushort)0;
@@ -164,7 +164,7 @@ namespace GDFiddle.UI.Text
                 previousCharCode = code;
             }
 
-            return new Size(width, LineHeight);
+            return new Vector2(width, LineHeight);
         }
     }
 }

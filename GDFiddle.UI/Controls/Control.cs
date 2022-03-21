@@ -12,16 +12,12 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _parent;
         private GUI? _gui;
-        /// <summary>
-        /// Size appointed by latest DoArrange call.
-        /// </summary>
-        public Size ActualSize { get; private set; }
-        
-        public virtual void Render(GuiRenderer guiRenderer, Size size)
+
+        public virtual void Render(GuiRenderer guiRenderer)
         {
             if (Background.HasValue)
             {
-                guiRenderer.DrawRectangle(new Vector2(0, 0), new Vector2(size.Width, size.Height), Background.Value, null);
+                guiRenderer.DrawRectangle(Vector2.Zero, ArrangedSize, Background.Value, null);
             }
         }
 
@@ -29,19 +25,20 @@ namespace GDFiddle.UI.Controls
         {
             return this;
         }
-        
+
         /// <summary>
         /// Makes the control arrange itself (and its children). Returns the size that it actually needs, which can be smaller or larger than the size provided by its parent.
         /// </summary>
-        public Size DoArrange(Size size)
+        public Vector2 DoArrange(RectangleF areaInParent)
         {
-             ActualSize = Arrange(size);
-             return ActualSize;
+            ArrangedSize = Arrange(areaInParent.Size);
+            OffsetFromParent = areaInParent.Location;
+            return ArrangedSize;
         }
 
-        protected virtual Size Arrange(Size size)
+        protected virtual Vector2 Arrange(Vector2 parentAvailableSize)
         {
-            return size;
+            return parentAvailableSize;
         }
 
         public virtual void NotifyMouseDown(Vector2 mousePosition)
@@ -56,12 +53,14 @@ namespace GDFiddle.UI.Controls
         {
         }
 
+
         public bool IsMouseOver { get; internal set; }
 
         /// <summary>
         /// What should the mouse look like when it is hovering over this control?
         /// </summary>
         public MouseCursor MouseCursor { get; set; } = MouseCursor.Arrow;
+
 
         public Color? Background { get; set; }
 
@@ -84,6 +83,11 @@ namespace GDFiddle.UI.Controls
             internal set => _gui = value;
         }
 
+        public Vector2 ArrangedSize { get; private set; }
+        internal Vector2 OffsetFromParent { get; private set; }
+        internal RectangleF ArrangeArea => new(OffsetFromParent, ArrangedSize);
+
         public event Action<Control?>? ParentChanged;
     }
 }
+

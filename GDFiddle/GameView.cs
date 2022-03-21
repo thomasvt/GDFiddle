@@ -30,10 +30,10 @@ namespace GDFiddle
             _messageBus.Subscribe<GameOpened>(opened => Game = opened.Game);
         }
 
-        public override void Render(GuiRenderer guiRenderer, Size size)
+        public override void Render(GuiRenderer guiRenderer)
         {
-            base.Render(guiRenderer, size);
-            var gameFrame = RenderGame(size);
+            base.Render(guiRenderer);
+            var gameFrame = RenderGame(ArrangedSize);
             guiRenderer.Draw(gameFrame);
             RenderGizmos(guiRenderer);
         }
@@ -50,7 +50,7 @@ namespace GDFiddle
         /// <summary>
         /// Renders the current game frame to a texture.
         /// </summary>
-        private Texture2D RenderGame(Size size)
+        private Texture2D RenderGame(Vector2 size)
         {
             var renderTarget = PrepareRenderTarget(size);
             _graphicsDevice.SetRenderTarget(renderTarget);
@@ -62,12 +62,12 @@ namespace GDFiddle
         /// <summary>
         /// Reuses the existing RenderTarget in videoram, or prepares a new one if the <see cref="GameView"/>'s size has changed.
         /// </summary>
-        private RenderTarget2D PrepareRenderTarget(Size size)
+        private RenderTarget2D PrepareRenderTarget(Vector2 size)
         {
-            if (_renderTarget == null || _renderTarget.Width != size.Width || _renderTarget.Height != size.Height)
+            if (_renderTarget == null || _renderTarget.Width != (int)size.X || _renderTarget.Height != (int)size.Y)
             {
                 _renderTarget?.Dispose();
-                _renderTarget = new RenderTarget2D(_graphicsDevice, size.Width, size.Height);
+                _renderTarget = new RenderTarget2D(_graphicsDevice, (int)size.X, (int)size.Y);
             }
             return _renderTarget;
         }

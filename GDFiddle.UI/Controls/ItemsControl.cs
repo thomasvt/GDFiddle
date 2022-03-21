@@ -4,7 +4,7 @@ using System.Numerics;
 namespace GDFiddle.UI.Controls
 {
     /// <summary>
-    /// A control containing a list of child controls.
+    /// A control containing a list of child controls that are rendered in a vertical stack.
     /// </summary>
     public class ItemsControl : Control
     {
@@ -13,44 +13,46 @@ namespace GDFiddle.UI.Controls
             Items = new ItemCollection(this);
         }
 
-        protected override Size Arrange(Size size)
+        protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
-            var neededSize = new Size(0, 0);
+            var neededSize = new Vector2(0, 0);
+            var childOffset = new Vector2(0, 0);
+            var remainingSize = parentAvailableSize;
 
             foreach (var item in Items)
             {
-                var itemSize = item.DoArrange(size);
-                if (itemSize.Width > neededSize.Width)
-                    neededSize.Width = itemSize.Width;
-                neededSize.Height += itemSize.Height;
+                var itemSize = item.DoArrange(new RectangleF(childOffset, parentAvailableSize));
+
+                if (itemSize.X > neededSize.X)
+                    neededSize.X = itemSize.X;
+
+                childOffset.Y += itemSize.Y;
+                remainingSize.Y -= itemSize.Y;
+                neededSize.Y += itemSize.Y;
             }
 
             return neededSize;
         }
 
-        public override Control GetControlAt(Vector2 position)
+        public override Control? GetControlAt(Vector2 position)
         {
-            var y = 0;
-            foreach (var item in Items)
+            if (Items.Any())
             {
-                if (new Rectangle(new Point(0, y), item.ActualSize).Contains(new Point((int) position.X, (int) position.Y)))
-                    return item;
-                y += item.ActualSize.Height;
+                var hitItem = Items.First(item => new RectangleF(item.OffsetFromParent, item.ArrangedSize).Contains(position));
+                var offset = hitItem.OffsetFromParent;
+                return hitItem.GetControlAt(position - offset);
             }
 
             return this;
         }
 
-        public override void Render(GuiRenderer guiRenderer, Size size)
+        public override void Render(GuiRenderer guiRenderer)
         {
-            base.Render(guiRenderer, size);
-            var y = 0;
+            base.Render(guiRenderer);
             foreach (var item in Items)
             {
-                var subArea = new Rectangle(0, y, size.Width, item.ActualSize.Height);
-                using var scope = guiRenderer.PushSubArea(subArea);
-                item.Render(guiRenderer, subArea.Size);
-                y += item.ActualSize.Height;
+                using var scope = guiRenderer.PushSubArea(item.ArrangeArea);
+                item.Render(guiRenderer);
             }
         }
 
