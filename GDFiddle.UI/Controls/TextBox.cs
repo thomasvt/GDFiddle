@@ -5,10 +5,15 @@ namespace GDFiddle.UI.Controls
 {
     public class TextBox : Control
     {
+        public TextBox()
+        {
+            IsFocusable = true;
+        }
+
         public override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
-            guiRenderer.DrawRectangle(new Vector2(0,0), ArrangedSize, null, Color.White);
+            guiRenderer.DrawRectangle(new Vector2(0,0), ArrangedSize, null, IsFocused ? Color.Yellow : Color.White);
             guiRenderer.DrawText(2,2, Text, Color.White, Font);
         }
 

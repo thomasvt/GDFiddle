@@ -101,6 +101,17 @@ namespace GDFiddle.UI.Controls
             _font = null;
         }
 
+        public void Unfocus()
+        {
+            IsFocused = false;
+            GUI!.FocusedControl = null;
+        }
+
+        public void Focus()
+        {
+            GUI!.SwitchFocus(this);
+        }
+
         /// <summary>
         /// The font used by this control. If not set explicitly, it returns the owning GUI's Font.
         /// </summary>
@@ -109,6 +120,10 @@ namespace GDFiddle.UI.Controls
             get => _font ?? GUI!.DefaultFont;
             set => _font = value;
         }
+
+        public bool IsFocusable { get; set; }
+
+        public bool IsFocused { get; set; }
     }
 }
 

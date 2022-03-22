@@ -49,14 +49,28 @@ namespace GDFiddle.UI
             if (_mouseOverControl != null)
                 LetControlProcessMouse(_mouseOverControl, mousePosition, mouseWentDown, mouseWentUp);
             else
-                MouseCursor = MouseCursor.Arrow;
+            {
+                ProcesMouseOutsideControls(mousePosition, mouseWentDown, mouseWentDown);
+            }
 
             _previousMousePosition = mousePosition;
         }
 
+        private void ProcesMouseOutsideControls(Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
+        {
+            if (mouseWentDown)
+                FocusedControl?.Unfocus();
+            MouseCursor = MouseCursor.Arrow;
+        }
+
         private void LetControlProcessMouse(Control control, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
-            if (mouseWentDown) control.NotifyMouseDown(mousePosition);
+            if (mouseWentDown)
+            {
+                if (control.IsFocusable)
+                    control.Focus();
+                control.NotifyMouseDown(mousePosition);
+            }
             if (mouseWentUp) control.NotifyMouseUp(mousePosition);
             if (_previousMousePosition != mousePosition) control.NotifyMouseMove(_previousMousePosition, mousePosition);
             MouseCursor = control.MouseCursor;
@@ -99,11 +113,28 @@ namespace GDFiddle.UI
             }
         }
 
+        public void SwitchFocus(Control? control) // TODO removed Textbox in PropertiesPanel is still focussed -> put all child controls in collection in baseclass and add remove logic to remove focus upon delete.
+        {
+            if (control?.IsFocusable != true)
+                throw new ArgumentException(nameof(control), "control is not focusable.");
+
+
+            if (FocusedControl != null)
+                FocusedControl.IsFocused = false;
+
+            FocusedControl = control;
+
+            if (FocusedControl != null)
+                FocusedControl.IsFocused = true;
+        }
+
         /// <summary>
         /// Defines what the mouse cursor currently should look like.
         /// </summary>
         public MouseCursor MouseCursor { get; set; } = MouseCursor.Arrow;
 
         public Font DefaultFont { get; }
+
+        public Control? FocusedControl { get; internal set; }
     }
 }
