@@ -14,10 +14,7 @@ namespace GDFiddle.Editor
                 Background = new Color(51, 51, 61),
                 Children =
                 {
-                    {
-                        new PropertiesPanel(messageBus),
-                        new GridProperties {Column = 0, Row = 0}
-                    }
+                    { new PropertiesPanel(messageBus), new GridProperties(0, 0) }
                 }
             };
         }

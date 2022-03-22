@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace GDFiddle.UI.Controls
 {
@@ -36,14 +35,12 @@ namespace GDFiddle.UI.Controls
 
         public override Control? GetControlAt(Vector2 position)
         {
-            if (Items.Any())
-            {
-                var hitItem = Items.First(item => new RectangleF(item.OffsetFromParent, item.ArrangedSize).Contains(position));
-                var offset = hitItem.OffsetFromParent;
-                return hitItem.GetControlAt(position - offset);
-            }
+            var hitItem = Items.FirstOrDefault(item => item.ArrangeArea.Contains(position));
+            if (hitItem == null)
+                return this;
 
-            return this;
+            var offset = hitItem.OffsetFromParent;
+            return hitItem.GetControlAt(position - offset);
         }
 
         public override void Render(GuiRenderer guiRenderer)

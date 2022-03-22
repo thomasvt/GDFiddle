@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
-using Rectangle = System.Drawing.Rectangle;
+﻿using System.Numerics;
 
 namespace GDFiddle.UI.Controls.Grids
 {

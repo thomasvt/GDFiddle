@@ -19,7 +19,7 @@ namespace GDFiddle.MonoGamePlatform
 
         public void BeginFrame(Matrix3x2 viewTransform)
         {
-            LastFrameSize = new (_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
+            LastFrameSize = new Vector2(_graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height);
             _sb.Begin(SpriteSortMode.Texture, BlendState.NonPremultiplied, SamplerState.PointClamp, DepthStencilState.Default, RasterizerState.CullNone, null, viewTransform.ToXna());
         }
 
@@ -30,7 +30,7 @@ namespace GDFiddle.MonoGamePlatform
 
         public void Draw(Sprite sprite, Vector2 position)
         {
-            _sb.Draw((Texture2D)sprite.Texture.PlatformTexture, sprite.Aabb.Translate(position).ToXna(), Color.White);
+            _sb.Draw((Texture2D)sprite.Texture.PlatformTexture, position.ToXna(), null, Color.White, 0f, -sprite.Aabb.TopLeft.ToXna(), 1f, SpriteEffects.None, 0f);
         }
 
         public Vector2 LastFrameSize { get; private set; }

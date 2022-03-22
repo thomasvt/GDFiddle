@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using GDFiddle.Ecs;
 using GDFiddle.Framework.Messaging;
 using GDFiddle.UI;

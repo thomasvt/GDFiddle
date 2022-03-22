@@ -21,6 +21,10 @@ namespace GDFiddle.UI.Controls
 
         public void Clear()
         {
+            foreach (var item in _items)
+            {
+                item.Parent = null;
+            }
             _items.Clear();
         }
 

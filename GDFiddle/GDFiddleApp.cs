@@ -23,7 +23,11 @@ namespace GDFiddle
         private readonly IMessageBus _messageBus;
         private MouseState _previousMouseState;
         private GDFiddleGame _game;
-        private EditorShell _editorShell;
+        private readonly RasterizerState _rasterizerState = new()
+        {
+            CullMode = CullMode.None,
+            ScissorTestEnable = true
+        };
 
         public GDFiddleApp()
         {
@@ -73,6 +77,7 @@ namespace GDFiddle
             var time = new Time((float) gameTime.TotalGameTime.TotalSeconds, (float) gameTime.ElapsedGameTime.TotalSeconds);
             _game?.Update(time);
             _gui!.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
+            _messageBus.Publish(new GameLogicUpdated());
             Mouse.SetCursor(_gui.MouseCursor);
             _previousMouseState = mouseState;
         }
@@ -91,11 +96,7 @@ namespace GDFiddle
             _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
             _effect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), new Vector3(0, 0, 0), Vector3.UnitY);
             _effect.VertexColorEnabled = true;
-            GraphicsDevice.RasterizerState = new RasterizerState
-            {
-                CullMode = CullMode.None,
-                ScissorTestEnable = true
-            };
+            GraphicsDevice.RasterizerState = _rasterizerState;
             GraphicsDevice.BlendState = BlendState.NonPremultiplied;
             GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
 
@@ -115,8 +116,7 @@ namespace GDFiddle
 
                 _effect.CurrentTechnique.Passes[0].Apply();
 
-                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderCommands.Vertices, command.VertexOffset,
-                    command.TriangleCount);
+                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderCommands.Vertices, command.VertexOffset, command.TriangleCount);
             }
         }
 

@@ -63,6 +63,9 @@ namespace GDFiddle.UI
 
         public void DrawText(float x, float y, string text, Color color, Font font)
         {
+            if (text.Length == 0)
+                return;
+
             var startVertexIdx = _vertices.Index;
             foreach (var glyphInfo in font.GetTextGlyphs((int)x, (int)y, text))
             {

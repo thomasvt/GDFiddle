@@ -2,15 +2,15 @@
 {
     public class GridProperties
     {
-        public GridProperties()
+        public GridProperties(int column, int row)
         {
-            Column = 0;
-            Row = 0;
+            Column = column;
+            Row = row;
         }
 
         public int Column { get; set; }
         public int Row { get; set; }
 
-        public static GridProperties Default() => new();
+        public static GridProperties Default() => new(0,0);
     }
 }

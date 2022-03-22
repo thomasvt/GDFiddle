@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 using Vector2 = System.Numerics.Vector2;
@@ -12,6 +12,7 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _parent;
         private GUI? _gui;
+        private Font? _font;
 
         public virtual void Render(GuiRenderer guiRenderer)
         {
@@ -31,9 +32,12 @@ namespace GDFiddle.UI.Controls
         /// </summary>
         public Vector2 DoArrange(RectangleF areaInParent)
         {
-            ArrangedSize = Arrange(areaInParent.Size);
+            var availableSize = areaInParent.Size;
+            var size = Arrange(availableSize);
+            
+            ArrangedSize = size;
             OffsetFromParent = areaInParent.Location;
-            return ArrangedSize;
+            return size;
         }
 
         protected virtual Vector2 Arrange(Vector2 parentAvailableSize)
@@ -67,7 +71,7 @@ namespace GDFiddle.UI.Controls
         public Control? Parent
         {
             get => _parent;
-            internal set
+            set
             {
                 if (_parent == value)
                     return;
@@ -88,6 +92,23 @@ namespace GDFiddle.UI.Controls
         internal RectangleF ArrangeArea => new(OffsetFromParent, ArrangedSize);
 
         public event Action<Control?>? ParentChanged;
+
+        /// <summary>
+        /// Reset font to GUI's default.
+        /// </summary>
+        public void ResetFont()
+        {
+            _font = null;
+        }
+
+        /// <summary>
+        /// The font used by this control. If not set explicitly, it returns the owning GUI's Font.
+        /// </summary>
+        public Font Font
+        {
+            get => _font ?? GUI!.DefaultFont;
+            set => _font = value;
+        }
     }
 }
 

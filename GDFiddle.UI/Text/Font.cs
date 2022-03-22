@@ -12,9 +12,11 @@ namespace GDFiddle.UI.Text
     public class Font
     {
         public object PlatformTexture { get; set; }
-        public int RowHeight => LineHeight;
 
-        internal readonly int LineHeight;
+        /// <summary>
+        /// The height of a text-line in this font in pixels.
+        /// </summary>
+        public readonly int LineHeight;
         internal readonly int Base;
         internal readonly Dictionary<int, Glyph> Glyphs;
         private readonly Dictionary<uint, int> _kernings; // kerning-distance by First+Second charcode combined into uint.

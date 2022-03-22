@@ -12,6 +12,9 @@ namespace GDFiddle.UI
 
         public RenderCommand(RectangleF scissorRectangle, int vertexOffset, int triangleCount, Texture2D? texture = null)
         {
+            if (triangleCount == 0)
+                throw new ArgumentOutOfRangeException(nameof(triangleCount),
+                    "Don't create RenderCommands with trianglecount 0.");
             ScissorRectangle = scissorRectangle;
             VertexOffset = vertexOffset;
             TriangleCount = triangleCount;
