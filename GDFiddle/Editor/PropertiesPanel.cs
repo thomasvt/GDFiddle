@@ -94,7 +94,7 @@ namespace GDFiddle.Editor
         {
             if (property.Type == typeof(Vector2))
             {
-                var item = new PropertiesPanelItem2(property.Label);
+                var item = new PropertiesPanelItem2(property.Label, TextBoxMode.Float);
                 item.Value1Edited += s =>
                 {
                     var component = _scene.GetComponent(entityId, componentId);

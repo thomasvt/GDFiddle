@@ -12,6 +12,8 @@ namespace GDFiddle.UI.Controls
     {
         private readonly Stopwatch _carretBlinkStopwatch;
         private int _caretIndex;
+        private int _selectionStart;
+        private int _selectionLength;
         private string _inputText;
         private bool _isCancelingInput;
         public const float Padding = 2f;
@@ -23,14 +25,21 @@ namespace GDFiddle.UI.Controls
             _inputText = string.Empty;
             _caretIndex = 0;
             _carretBlinkStopwatch = new Stopwatch();
+            MouseCursor = MouseCursor.IBeam;
         }
 
         protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
-            guiRenderer.DrawRectangle(new Vector2(0,0), ArrangedSize, null, IsFocused ? Color.Yellow : Color.White);
+            guiRenderer.DrawRectangle(new Vector2(0, 0), ArrangedSize, null, IsFocused ? Color.Yellow : Color.White);
             if (IsFocused)
             {
+                if (_selectionLength > 0)
+                {
+                    var selectionStart = Font.Measure(InputText.Substring(0, _selectionStart)).X;
+                    var selectionLength = Font.Measure(InputText.Substring(0, _selectionStart + _selectionLength)).X - selectionStart;
+                    guiRenderer.DrawRectangle(new Vector2(selectionStart + Padding, Padding), new Vector2(selectionLength, Font.LineHeight), new Color(Color.Yellow, 0.3f), null);
+                }
                 guiRenderer.DrawText(Padding, Padding, InputText, Color.White, Font);
                 if (_carretBlinkStopwatch.ElapsedMilliseconds % 1000 < 500)
                 {
@@ -53,23 +62,51 @@ namespace GDFiddle.UI.Controls
         {
             switch (pressedKey)
             {
-                case Keys.Left: CaretIndex--; break; // arrows are rejected in TextInput code in MonoGame, they should though :(
-                case Keys.Right: CaretIndex++; break; // arrows don't work
                 case Keys.Escape: CancelInput(); break;
-                case Keys.Delete: if (CaretIndex < InputText.Length) InputText = InputText.Remove(CaretIndex, 1); break;
+                case Keys.Delete:
+                    if (_selectionLength > 0)
+                        DeleteSelection();
+                    else if (CaretIndex < InputText.Length) 
+                        InputText = InputText.Remove(CaretIndex, 1); 
+                    break;
 
                 case Keys.Back:
-                    if (CaretIndex > 0)
+                    if (_selectionLength > 0)
+                        DeleteSelection();
+                    else if (CaretIndex > 0)
                     {
-                        var caret = CaretIndex-1;
+                        var caret = CaretIndex - 1;
                         InputText = InputText.Remove(caret, 1);
                         CaretIndex = caret; // use temp var to bypass coercion in property setters and shift 2 position to left when caret at end of string.
                     }
                     break;
                 default:
+                    if (_selectionLength > 0)
+                        DeleteSelection();
                     InputText = InputText.Insert(CaretIndex, typedCharacter.ToString());
                     CaretIndex++;
                     break;
+            }
+        }
+
+        private void DeleteSelection()
+        {
+            InputText = InputText.Remove(_selectionStart, _selectionLength);
+            CaretIndex = _selectionStart;
+            _selectionLength = 0;
+        }
+
+        internal override void OnKeyDown(Keys pressedKey)
+        {
+            // All keys should be processed in OnTextInput, so they support the OS driven repeat delay,
+            // but some keys are filtered out by monogame in the TextInput logic, so we have to do a poor man's solution here:
+            switch (pressedKey)
+            {
+                case Keys.Left: MoveCaret(_selectionLength != 0 ? _selectionStart : CaretIndex-1); break;
+                case Keys.Right: MoveCaret(_selectionLength != 0 ? _selectionStart + _selectionLength : CaretIndex + 1); break;
+                case Keys.Home: MoveCaret(0); break;
+                case Keys.End: MoveCaret(InputText.Length); break;
+                case Keys.Enter: ConfirmInput(); break;
             }
         }
 
@@ -88,23 +125,23 @@ namespace GDFiddle.UI.Controls
         private void StartInput()
         {
             _carretBlinkStopwatch.Start();
-            _isCancelingInput = false;
             InputText = Text;
-            CaretIndex = InputText.Length;
+            Select(0, InputText.Length);
         }
 
-        internal override void OnKeyDown(Keys pressedKey)
+        private void Select(int start, int length)
         {
-            // All keys should be processed in OnTextInput, so they support the OS driven repeat delay,
-            // but some keys are filtered out by monogame in the TextInput logic, so we have to do a poor man's solution here:
-            switch (pressedKey)
-            {
-                case Keys.Left: CaretIndex--; _carretBlinkStopwatch.Restart(); break;
-                case Keys.Right: CaretIndex++; _carretBlinkStopwatch.Restart(); break;
-                case Keys.Home: CaretIndex = 0; _carretBlinkStopwatch.Restart(); break;
-                case Keys.End: CaretIndex = InputText.Length; _carretBlinkStopwatch.Restart(); break;
-                case Keys.Enter: ConfirmInput(); break;
-            }
+            _selectionStart = start;
+            _selectionLength = length;
+            CaretIndex = start + length;
+        }
+
+        private void MoveCaret(int destination)
+        {
+            CaretIndex = destination;
+            _selectionLength = 0;
+            _selectionStart = CaretIndex;
+            _carretBlinkStopwatch.Restart();
         }
 
         protected override void OnFocus()
@@ -114,26 +151,39 @@ namespace GDFiddle.UI.Controls
 
         protected override void OnUnfocus()
         {
-            if (!_isCancelingInput)
+            if (_isCancelingInput || !ReportConfirmedInput())
             {
-                ReportConfirmedInput();
             }
         }
 
-        private void ReportConfirmedInput()
+        private bool ReportConfirmedInput()
         {
+            if (InputText == string.Empty && Mode is TextBoxMode.Int or TextBoxMode.Float)
+                InputText = "0";
+
             if (!IsValidInput(InputText))
             {
-                return;
+                return false;
             }
 
             Text = InputText;
             InputCompleted?.Invoke(InputText);
+            return true;
         }
 
         private bool IsValidInput(string text)
         {
-            return true;
+            switch (Mode)
+            {
+                case TextBoxMode.String:
+                    return true;
+                case TextBoxMode.Int:
+                    return int.TryParse(text, out _);
+                case TextBoxMode.Float:
+                    return float.TryParse(text, out _);
+                default:
+                    throw new NotSupportedException($"Unknown TextBoxMode: '{Mode}'.");
+            }
         }
 
         public string Text { get; set; }
@@ -172,6 +222,11 @@ namespace GDFiddle.UI.Controls
                 CaretIndex = InputText.Length;
         }
 
+        public TextBoxMode Mode { get; set; }
+
+        /// <summary>
+        /// Triggered when a user confirmed an input typed in the <see cref="TextBox"/>. Cancels the ending of the user input if you return false.
+        /// </summary>
         public event Action<string>? InputCompleted;
     }
 }

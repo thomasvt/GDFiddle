@@ -17,12 +17,12 @@ namespace GDFiddle.Editor
         private readonly TextBox _textBox2;
         private readonly TextBlock _label;
 
-        public PropertiesPanelItem2(string label)
+        public PropertiesPanelItem2(string label, TextBoxMode mode)
         {
             _label = new TextBlock {Text = label, Parent = this};
-            _textBox1 = new TextBox { Parent = this };
+            _textBox1 = new TextBox { Parent = this, Mode = mode };
             _textBox1.InputCompleted += s => Value1Edited?.Invoke(s);
-            _textBox2 = new TextBox { Parent = this };
+            _textBox2 = new TextBox { Parent = this , Mode = mode };
             _textBox2.InputCompleted += s => Value2Edited?.Invoke(s);
         }
 
