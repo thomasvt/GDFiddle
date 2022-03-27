@@ -57,7 +57,7 @@ namespace GDFiddle.UI.Controls
                 case Keys.Right: CaretIndex++; break; // arrows don't work
                 case Keys.Escape: CancelInput(); break;
                 case Keys.Delete: if (CaretIndex < InputText.Length) InputText = InputText.Remove(CaretIndex, 1); break;
-                
+
                 case Keys.Back:
                     if (CaretIndex > 0)
                     {
@@ -79,6 +79,12 @@ namespace GDFiddle.UI.Controls
             Unfocus();
         }
 
+        private void ConfirmInput()
+        {
+            _isCancelingInput = false;
+            Unfocus();
+        }
+
         private void StartInput()
         {
             _carretBlinkStopwatch.Start();
@@ -89,13 +95,15 @@ namespace GDFiddle.UI.Controls
 
         internal override void OnKeyDown(Keys pressedKey)
         {
-            // All keys should be processed in OnTextInput, so they support the OS driven repeat delay, but MonoGame filters out some keys, so we have to do a poor man's solution here:
+            // All keys should be processed in OnTextInput, so they support the OS driven repeat delay,
+            // but some keys are filtered out by monogame in the TextInput logic, so we have to do a poor man's solution here:
             switch (pressedKey)
             {
                 case Keys.Left: CaretIndex--; _carretBlinkStopwatch.Restart(); break;
                 case Keys.Right: CaretIndex++; _carretBlinkStopwatch.Restart(); break;
                 case Keys.Home: CaretIndex = 0; _carretBlinkStopwatch.Restart(); break;
                 case Keys.End: CaretIndex = InputText.Length; _carretBlinkStopwatch.Restart(); break;
+                case Keys.Enter: ConfirmInput(); break;
             }
         }
 
@@ -108,11 +116,11 @@ namespace GDFiddle.UI.Controls
         {
             if (!_isCancelingInput)
             {
-                CommitInput();
+                ReportConfirmedInput();
             }
         }
 
-        private void CommitInput()
+        private void ReportConfirmedInput()
         {
             if (!IsValidInput(InputText))
             {
