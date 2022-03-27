@@ -102,7 +102,7 @@ namespace GDFiddle
 
             foreach (var command in renderCommands.RenderCommands)
             {
-                GraphicsDevice.ScissorRectangle = command.ScissorRectangle.ToXna();
+                GraphicsDevice.ScissorRectangle = new Microsoft.Xna.Framework.Rectangle((int)command.ScissorRectangle.Location.X, (int)command.ScissorRectangle.Location.Y, (int)(Math.Ceiling(command.ScissorRectangle.Size.X)), (int)(Math.Ceiling(command.ScissorRectangle.Size.Y)));
                 _effect.World = Matrix.CreateTranslation(command.ScissorRectangle.Location.X, command.ScissorRectangle.Location.Y, 0f);
                 if (command.Texture != null)
                 {

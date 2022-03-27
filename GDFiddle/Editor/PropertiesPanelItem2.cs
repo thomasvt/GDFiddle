@@ -5,7 +5,7 @@ using GDFiddle.UI.Controls.Grids;
 namespace GDFiddle.Editor
 {
     /// <summary>
-    /// Property control showing a label and a single value that is fetched directly from its datasource through a delegate.
+    /// Property control showing a label and a value of 2 fields.
     /// </summary>
     internal class PropertiesPanelItem2 : Grid
     {
