@@ -39,6 +39,10 @@ namespace GDFiddle.Ecs
         Archetype GetArchetype(EntityId entityId);
         bool Exists(EntityId entityId);
         void SetComponent<TComponent>(EntityId entityId, in TComponent component) where TComponent : struct;
+        /// <summary>
+        /// Sets the component for the entity, the CLR type of component is used to define the component. Editor/inspection use only.
+        /// </summary>
+        void SetComponentDynamic(EntityId entityId, in object component);
 
         /// <summary>
         /// Registers a callback for when components of a specific type are removed. This gets triggered when an entity with a matching component is removed, or just the component is removed from an entity.
@@ -71,8 +75,18 @@ namespace GDFiddle.Ecs
         EntityId CreateEntity<TC1, TC2, TC3, TC4, TC5>(in Func<EntityId, TC1> c1, in Func<EntityId, TC2> c2, in Func<EntityId, TC3> c3, in Func<EntityId, TC4> c4, in Func<EntityId, TC5> c5) where TC1 : struct where TC2 : struct where TC3 : struct where TC4 : struct where TC5 : struct;
 
         /// <summary>
-        /// Returns all components of the given entity as objects. For inspection purposes.
+        /// Returns all components of the given entity as objects. Editor/inspection use only.
         /// </summary>
         IEnumerable GetComponents(EntityId entityId);
+
+        /// <summary>
+        /// Returns the numerical id of the component type. Each CLR type that is a component gets a unique ID.
+        /// </summary>
+        byte GetComponentId(Type type);
+
+        /// <summary>
+        /// Returns the component data of the entity as a boxed <see cref="Object"/>. Editor/inspection use only.
+        /// </summary>
+        object GetComponent(EntityId entityId, int componentId);
     }
 }

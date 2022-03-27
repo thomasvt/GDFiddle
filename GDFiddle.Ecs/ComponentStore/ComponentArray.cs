@@ -13,7 +13,15 @@
         public abstract void Grow(int capacity);
 
         public abstract void TriggerCallback(object callback, EntityId entityId, int idx);
+        /// <summary>
+        /// Gets a boxed version of the component at the given index. Editor use only.
+        /// </summary>
         public abstract object GetByIdx(int index);
+
+        /// <summary>
+        /// Sets the component at the given index from a boxed version. Editor use only.
+        /// </summary>
+        public abstract void SetByIdx(int index, in object component);
     }
 
     internal class ComponentArray<T>
@@ -67,6 +75,14 @@
         public override object GetByIdx(int index)
         {
             return Records[index];
+        }
+
+        public override void SetByIdx(int index, in object component)
+        {
+            if (component is not T typedComponent)
+                throw new ArgumentException($"SetByIdx failed: the given value is of type {component.GetType().Name} instead of the expected '{typeof(T).Name}'.");
+
+            Records[index] = typedComponent;
         }
     }
 }

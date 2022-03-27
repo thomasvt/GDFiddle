@@ -80,8 +80,7 @@ namespace GDFiddle.UI
         {
             if (mouseWentDown)
             {
-                if (control.IsFocusable)
-                    SwitchFocusTo(control);
+                SwitchFocusTo(control.IsFocusable ? control : null);
                 control.OnMouseDown(mousePosition);
             }
             if (mouseWentUp) control.OnMouseUp(mousePosition);

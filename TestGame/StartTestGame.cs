@@ -26,9 +26,9 @@ namespace TestGame
 
         public void Update(Time time)
         {
-            ref var position = ref _scene.GetComponentRef<PositionComponent>(_id);
-            position.Position.X = MathF.Cos(time.TotalTime) * 100;
-            position.Position.Y = MathF.Sin(time.TotalTime) * 100;
+            //ref var position = ref _scene.GetComponentRef<PositionComponent>(_id);
+            //position.Position.X = MathF.Cos(time.TotalTime) * 100;
+            //position.Position.Y = MathF.Sin(time.TotalTime) * 100;
         }
     }
 }

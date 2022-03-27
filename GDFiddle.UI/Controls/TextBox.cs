@@ -13,6 +13,7 @@ namespace GDFiddle.UI.Controls
         private readonly Stopwatch _carretBlinkStopwatch;
         private int _caretIndex;
         private string _inputText;
+        private bool _isCancelingInput;
         public const float Padding = 2f;
 
         public TextBox()
@@ -48,14 +49,13 @@ namespace GDFiddle.UI.Controls
             return new Vector2(parentAvailableSize.X, Font.LineHeight + Padding * 2);
         }
 
-
         internal override void OnTextInput(Keys pressedKey, char typedCharacter)
         {
             switch (pressedKey)
             {
                 case Keys.Left: CaretIndex--; break; // arrows are rejected in TextInput code in MonoGame, they should though :(
                 case Keys.Right: CaretIndex++; break; // arrows don't work
-                case Keys.Escape: Unfocus(); break;
+                case Keys.Escape: CancelInput(); break;
                 case Keys.Delete: if (CaretIndex < InputText.Length) InputText = InputText.Remove(CaretIndex, 1); break;
                 
                 case Keys.Back:
@@ -73,6 +73,20 @@ namespace GDFiddle.UI.Controls
             }
         }
 
+        private void CancelInput()
+        {
+            _isCancelingInput = true;
+            Unfocus();
+        }
+
+        private void StartInput()
+        {
+            _carretBlinkStopwatch.Start();
+            _isCancelingInput = false;
+            InputText = Text;
+            CaretIndex = InputText.Length;
+        }
+
         internal override void OnKeyDown(Keys pressedKey)
         {
             // All keys should be processed in OnTextInput, so they support the OS driven repeat delay, but MonoGame filters out some keys, so we have to do a poor man's solution here:
@@ -87,9 +101,31 @@ namespace GDFiddle.UI.Controls
 
         protected override void OnFocus()
         {
-            _carretBlinkStopwatch.Start();
-            InputText = Text;
-            CaretIndex = InputText.Length;
+            StartInput();
+        }
+
+        protected override void OnUnfocus()
+        {
+            if (!_isCancelingInput)
+            {
+                CommitInput();
+            }
+        }
+
+        private void CommitInput()
+        {
+            if (!IsValidInput(InputText))
+            {
+                return;
+            }
+
+            Text = InputText;
+            InputCompleted?.Invoke(InputText);
+        }
+
+        private bool IsValidInput(string text)
+        {
+            return true;
         }
 
         public string Text { get; set; }

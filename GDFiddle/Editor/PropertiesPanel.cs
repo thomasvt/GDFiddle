@@ -53,7 +53,7 @@ namespace GDFiddle.Editor
 
             if (field.Type == typeof(Vector2))
             {
-                var v = (Vector2)field.GetValue(component)!;
+                var v = (Vector2)field.Getter(component)!;
                 propertiesPanelItem.Value1 = v.X.ToString();
                 propertiesPanelItem.Value2 = v.Y.ToString();
             }
@@ -73,14 +73,14 @@ namespace GDFiddle.Editor
                 var type = component.GetType();
                 if (!_fieldsPerComponentType.TryGetValue(type, out var fieldList))
                 {
-                    fieldList = type.GetFields().Select(f => new ComponentField(f.FieldType, f.Name, f.GetValue)).ToList();
+                    fieldList = type.GetFields().Select(f => new ComponentField(f.FieldType, f.Name, f.GetValue, f.SetValue)).ToList();
                     _fieldsPerComponentType.Add(type, fieldList);
                 }
 
                 itemsControl.Items.Add(new TextBlock { Text = component.GetType().Name, Foreground = Color.Gray });
                 foreach (var field in fieldList)
                 {
-                    var propertiesPanelItem = BuildPropertiesPanelItem(field);
+                    var propertiesPanelItem = BuildPropertiesPanelItem(field, entityId.Value, _scene.GetComponentId(type));
                     if (propertiesPanelItem == null)
                         continue;
                     _propertiesPanelItemsPerField.Add(field, propertiesPanelItem);
@@ -89,11 +89,28 @@ namespace GDFiddle.Editor
             }
         }
 
-        private static PropertiesPanelItem2? BuildPropertiesPanelItem(ComponentField property)
+        private PropertiesPanelItem2? BuildPropertiesPanelItem(ComponentField property, EntityId entityId, byte componentId)
         {
             if (property.Type == typeof(Vector2))
             {
-                return new PropertiesPanelItem2(property.Label);
+                var item = new PropertiesPanelItem2(property.Label);
+                item.Value1Edited += s =>
+                {
+                    var component = _scene.GetComponent(entityId, componentId);
+                    var value = (Vector2) property.Getter(component);
+                    value.X = float.Parse(s);
+                    property.Setter(component, value);
+                    _scene.SetComponentDynamic(entityId, component);
+                };
+                item.Value2Edited += s =>
+                {
+                    var component = _scene.GetComponent(entityId, componentId);
+                    var value = (Vector2)property.Getter(component);
+                    value.Y = float.Parse(s);
+                    property.Setter(component, value);
+                    _scene.SetComponentDynamic(entityId, component);
+                };
+                return item;
             }
 
             return null;

@@ -108,6 +108,19 @@ namespace GDFiddle.Ecs
             }
         }
 
+        public object GetComponent(EntityId entityId, int componentId)
+        {
+            var entityIndexRecord = EntityIndex.Records[entityId];
+            var pool = Pools[entityIndexRecord.PoolIdx];
+            var componentArray = pool.ComponentArraysPerComponentId[componentId];
+            return componentArray.GetByIdx(entityIndexRecord.IdxInPool);
+        }
+
+        public byte GetComponentId(Type type)
+        {
+            return ComponentRegistry.GetComponentId(type);
+        }
+
         public void AddComponent<TComponent>(EntityId entityId) where TComponent : struct
         {
             ThrowIfNotSafe();
@@ -157,6 +170,18 @@ namespace GDFiddle.Ecs
                 throw new Exception($"Entity \"{entityId}\" does not have a {typeof(TComponent).Name}.");
             var componentArray = (ComponentArray<TComponent>)pool.ComponentArraysPerComponentId[componentId];
             componentArray.Records[entityIndexRecord.IdxInPool] = component;
+        }
+
+        public void SetComponentDynamic(EntityId entityId, in object component)
+        {
+            var entityIndexRecord = EntityIndex.Records[entityId];
+            var pool = Pools[entityIndexRecord.PoolIdx];
+            if (!ComponentRegistry.ComponentIdsByType.TryGetValue(component.GetType(), out var componentId))
+                throw new Exception($"Entity \"{entityId}\" does not have a {component.GetType().Name}. It is not even a registered component.");
+            if (!pool.Archetype.Contains(componentId))
+                throw new Exception($"Entity \"{entityId}\" does not have a {component.GetType().Name}.");
+            var componentArray = (ComponentArray)pool.ComponentArraysPerComponentId[componentId];
+            componentArray.SetByIdx(entityIndexRecord.IdxInPool, component);
         }
 
         public ref TComponent GetComponentRef<TComponent>(EntityId entityId) where TComponent : struct

@@ -18,6 +18,11 @@
             return ComponentIdsByType[componentType];
         }
 
+        internal byte GetComponentId(Type componentType)
+        {
+            return ComponentIdsByType[componentType];
+        }
+
         internal byte GetOrRegisterComponentId<TC>() where TC : struct
         {
             var componentType = typeof(TC);

@@ -21,7 +21,9 @@ namespace GDFiddle.Editor
         {
             _label = new TextBlock {Text = label, Parent = this};
             _textBox1 = new TextBox { Parent = this };
+            _textBox1.InputCompleted += s => Value1Edited?.Invoke(s);
             _textBox2 = new TextBox { Parent = this };
+            _textBox2.InputCompleted += s => Value2Edited?.Invoke(s);
         }
 
         protected override Vector2 Arrange(Vector2 parentAvailableSize)
@@ -53,5 +55,14 @@ namespace GDFiddle.Editor
 
         public string Value1 { get => _textBox1.Text; set => _textBox1.Text = value; }
         public string Value2 { get => _textBox2.Text; set => _textBox2.Text = value; }
+
+        /// <summary>
+        /// The user has finished changing the value.
+        /// </summary>
+        public event Action<string> Value1Edited;
+        /// <summary>
+        /// The user has finished changing the value.
+        /// </summary>
+        public event Action<string> Value2Edited;
     }
 }

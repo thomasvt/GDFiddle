@@ -28,7 +28,12 @@ namespace GDFiddle
 
         public void Start()
         {
-            _renderSystem = _container.ResolveAllWithBaseType<IRenderSystem>().Single();
+            var renderSystems = _container.ResolveAllWithBaseType<IRenderSystem>();
+            if (!renderSystems.Any())
+                throw new Exception("Your game has no IRenderSystem implementer.");
+            if (renderSystems.Count() > 1)
+                throw new Exception("Your game has more than one IRenderSystem implementer.");
+            _renderSystem = renderSystems.Single();
             var initializables = _container.ResolveAllWithBaseType<IInitialize>();
             _updatables = _container.ResolveAllWithBaseType<IUpdate>().ToList();
 
