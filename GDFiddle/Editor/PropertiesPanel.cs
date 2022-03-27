@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Globalization;
+using System.Numerics;
 using GDFiddle.Ecs;
 using GDFiddle.Framework.Messaging;
 using GDFiddle.UI.Controls;
@@ -54,8 +55,8 @@ namespace GDFiddle.Editor
             if (field.Type == typeof(Vector2))
             {
                 var v = (Vector2)field.Getter(component)!;
-                propertiesPanelItem.Value1 = v.X.ToString();
-                propertiesPanelItem.Value2 = v.Y.ToString();
+                propertiesPanelItem.Value1 = v.X.ToString(CultureInfo.InvariantCulture);
+                propertiesPanelItem.Value2 = v.Y.ToString(CultureInfo.InvariantCulture);
             }
         }
 
@@ -98,7 +99,7 @@ namespace GDFiddle.Editor
                 {
                     var component = _scene.GetComponent(entityId, componentId);
                     var value = (Vector2) property.Getter(component);
-                    value.X = float.Parse(s);
+                    value.X = float.Parse(s, CultureInfo.InvariantCulture);
                     property.Setter(component, value);
                     _scene.SetComponentDynamic(entityId, component);
                 };
@@ -106,7 +107,7 @@ namespace GDFiddle.Editor
                 {
                     var component = _scene.GetComponent(entityId, componentId);
                     var value = (Vector2)property.Getter(component);
-                    value.Y = float.Parse(s);
+                    value.Y = float.Parse(s, CultureInfo.InvariantCulture);
                     property.Setter(component, value);
                     _scene.SetComponentDynamic(entityId, component);
                 };
