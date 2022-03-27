@@ -36,7 +36,7 @@ namespace GDFiddle.UI.Controls.Grids
             _right = grid.ColumnDefinitions[splitterColumn + 1];
         }
 
-        public override void NotifyMouseDown(Vector2 mousePosition)
+        public override void OnMouseDown(Vector2 mousePosition)
         {
             if (_left == null || _right == null)
                 return;
@@ -46,7 +46,7 @@ namespace GDFiddle.UI.Controls.Grids
             _startDragLeftSize = _left.ActualLayout.Size;
         }
 
-        public override void NotifyMouseMove(Vector2 oldPosition, Vector2 newPosition)
+        public override void OnMouseMove(Vector2 oldPosition, Vector2 newPosition)
         {
             if (GUI!.HasMouseCapture(this))
             {
@@ -55,7 +55,7 @@ namespace GDFiddle.UI.Controls.Grids
             }
         }
 
-        public override void NotifyMouseUp(Vector2 mousePosition)
+        public override void OnMouseUp(Vector2 mousePosition)
         {
             GUI!.ReleaseMouse();
         }

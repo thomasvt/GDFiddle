@@ -1,4 +1,5 @@
-﻿using GDFiddle.UI.Text;
+﻿using System.Diagnostics.SymbolStore;
+using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 using Vector2 = System.Numerics.Vector2;
@@ -45,18 +46,21 @@ namespace GDFiddle.UI.Controls
             return parentAvailableSize;
         }
 
-        public virtual void NotifyMouseDown(Vector2 mousePosition)
+        public virtual void OnMouseDown(Vector2 mousePosition)
         {
         }
 
-        public virtual void NotifyMouseUp(Vector2 mousePosition)
+        public virtual void OnMouseUp(Vector2 mousePosition)
         {
         }
 
-        public virtual void NotifyMouseMove(Vector2 oldPosition, Vector2 newPosition)
+        public virtual void OnMouseMove(Vector2 oldPosition, Vector2 newPosition)
         {
         }
 
+        public virtual void OnTextInput(Keys pressedKey, char typedCharacter)
+        {
+        }
 
         public bool IsMouseOver { get; internal set; }
 
@@ -103,13 +107,32 @@ namespace GDFiddle.UI.Controls
 
         public void Unfocus()
         {
-            IsFocused = false;
-            GUI!.FocusedControl = null;
+            GUI!.SwitchFocusTo(null);
         }
 
         public void Focus()
         {
-            GUI!.SwitchFocus(this);
+            GUI!.SwitchFocusTo(this);
+        }
+
+        public void UnfocusInternal()
+        {
+            IsFocused = false;
+            OnUnfocus();
+        }
+
+        protected virtual void OnUnfocus()
+        {
+        }
+
+        public void FocusInternal()
+        {
+            IsFocused = true;
+            OnFocus();
+        }
+
+        protected virtual void OnFocus()
+        {
         }
 
         /// <summary>

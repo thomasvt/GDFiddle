@@ -71,7 +71,7 @@ namespace GDFiddle
             return _renderTarget;
         }
 
-        public override void NotifyMouseDown(Vector2 mousePosition)
+        public override void OnMouseDown(Vector2 mousePosition)
         {
             Select(Game?.GetEntityAt(mousePosition));
         }

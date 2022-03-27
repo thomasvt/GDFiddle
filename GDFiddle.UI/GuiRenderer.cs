@@ -61,9 +61,9 @@ namespace GDFiddle.UI
             _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 
-        public void DrawText(float x, float y, string text, Color color, Font font)
+        public void DrawText(float x, float y, string? text, Color color, Font font)
         {
-            if (text.Length == 0)
+            if (string.IsNullOrEmpty(text))
                 return;
 
             var startVertexIdx = _vertices.Index;

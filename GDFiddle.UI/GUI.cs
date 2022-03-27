@@ -27,6 +27,11 @@ namespace GDFiddle.UI
             ProcessMouse(viewArea, mousePosition, mouseWentDown, mouseWentUp);
         }
 
+        public void ProcessTextInput(Keys pressedKey, char typedCharacter)
+        {
+            FocusedControl?.OnTextInput(pressedKey, typedCharacter);
+        }
+
         private void ProcessMouse(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
             if (_mouseCapturer != null)
@@ -49,9 +54,7 @@ namespace GDFiddle.UI
             if (_mouseOverControl != null)
                 LetControlProcessMouse(_mouseOverControl, mousePosition, mouseWentDown, mouseWentUp);
             else
-            {
                 ProcesMouseOutsideControls(mousePosition, mouseWentDown, mouseWentDown);
-            }
 
             _previousMousePosition = mousePosition;
         }
@@ -59,7 +62,7 @@ namespace GDFiddle.UI
         private void ProcesMouseOutsideControls(Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
             if (mouseWentDown)
-                FocusedControl?.Unfocus();
+                SwitchFocusTo(null);
             MouseCursor = MouseCursor.Arrow;
         }
 
@@ -68,11 +71,11 @@ namespace GDFiddle.UI
             if (mouseWentDown)
             {
                 if (control.IsFocusable)
-                    control.Focus();
-                control.NotifyMouseDown(mousePosition);
+                    SwitchFocusTo(control);
+                control.OnMouseDown(mousePosition);
             }
-            if (mouseWentUp) control.NotifyMouseUp(mousePosition);
-            if (_previousMousePosition != mousePosition) control.NotifyMouseMove(_previousMousePosition, mousePosition);
+            if (mouseWentUp) control.OnMouseUp(mousePosition);
+            if (_previousMousePosition != mousePosition) control.OnMouseMove(_previousMousePosition, mousePosition);
             MouseCursor = control.MouseCursor;
         }
 
@@ -113,19 +116,14 @@ namespace GDFiddle.UI
             }
         }
 
-        public void SwitchFocus(Control? control) // TODO removed Textbox in PropertiesPanel is still focussed -> put all child controls in collection in baseclass and add remove logic to remove focus upon delete.
+        public void SwitchFocusTo(Control? control) // TODO a deleted Textbox in PropertiesPanel is still focussed -> put all child controls in collection in baseclass and add remove logic to remove focus upon delete.
         {
             if (control?.IsFocusable != true)
                 throw new ArgumentException(nameof(control), "control is not focusable.");
 
-
-            if (FocusedControl != null)
-                FocusedControl.IsFocused = false;
-
+            FocusedControl?.UnfocusInternal();
             FocusedControl = control;
-
-            if (FocusedControl != null)
-                FocusedControl.IsFocused = true;
+            FocusedControl?.FocusInternal();
         }
 
         /// <summary>

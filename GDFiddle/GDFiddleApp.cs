@@ -2,7 +2,6 @@
 using GDFiddle.Editor;
 using GDFiddle.Framework.Messaging;
 using GDFiddle.Games;
-using GDFiddle.MonoGamePlatform;
 using GDFiddle.UI;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
@@ -29,6 +28,8 @@ namespace GDFiddle
             ScissorTestEnable = true
         };
 
+        private KeyboardState _previousKeyboardState;
+
         public GDFiddleApp()
         {
             _gdm = new GraphicsDeviceManager(this);
@@ -36,6 +37,7 @@ namespace GDFiddle
             IsMouseVisible = true;
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
+            Window.TextInput += (sender, args) => _gui?.ProcessTextInput(args.Key, args.Character);
         }
 
         private void OnResize(object? sender, EventArgs e)
@@ -70,6 +72,7 @@ namespace GDFiddle
         {
             base.Update(gameTime);
             var mouseState = Mouse.GetState(Window);
+            var keyboardState = Keyboard.GetState();
             var mousePosition = new Vector2(mouseState.X, mouseState.Y);
             var mouseWentDown = mouseState.LeftButton == ButtonState.Pressed && _previousMouseState.LeftButton == ButtonState.Released;
             var mouseWentUp = mouseState.LeftButton == ButtonState.Released && _previousMouseState.LeftButton == ButtonState.Pressed;
@@ -79,7 +82,9 @@ namespace GDFiddle
             _gui!.Update(GetViewArea(), mousePosition, mouseWentDown, mouseWentUp);
             _messageBus.Publish(new GameLogicUpdated());
             Mouse.SetCursor(_gui.MouseCursor);
+
             _previousMouseState = mouseState;
+            _previousKeyboardState = keyboardState;
         }
 
         protected override void Draw(GameTime gameTime)
@@ -129,7 +134,7 @@ namespace GDFiddle
 
         private void CreateEditorGui()
         {
-            var font = Font.FromBMFontFile(GraphicsDevice, "SegoeUI14_0.png", "SegoeUI14.fnt");
+            var font = Font.FromBMFontFile(GraphicsDevice, "SegoeUI12_0.png", "SegoeUI12.fnt");
             _gui = new GUI(new GuiRenderer(), font)
             {
                 Root = new EditorShell(GraphicsDevice, _messageBus)
