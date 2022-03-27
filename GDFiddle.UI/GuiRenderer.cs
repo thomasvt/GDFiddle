@@ -67,6 +67,7 @@ namespace GDFiddle.UI
                 return;
 
             var startVertexIdx = _vertices.Index;
+            _vertices.EnsureCapacity(6 * text.Length);
             foreach (var glyphInfo in font.GetTextGlyphs((int)x, (int)y, text))
             {
                 AppendQuad(glyphInfo.QuadMin, glyphInfo.QuadMax, glyphInfo.UVMin, glyphInfo.UVMax, color);
@@ -78,13 +79,22 @@ namespace GDFiddle.UI
         public void Draw(Texture2D texture)
         {
             var startVertexIdx = _vertices.Index;
+            _vertices.EnsureCapacity(6);
             AppendQuad(Vector2.Zero, new Vector2(texture.Width, texture.Height), Vector2.Zero, Vector2.One, Color.White);
             _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, 2, texture));
         }
 
-        private void AppendQuad(Vector2 min, Vector2 max, Vector2 uvMin, Vector2 uvMax, Color color)
+        public void DrawLine(Vector2 a, Vector2 b, float thickness, Color color)
         {
             _vertices.EnsureCapacity(6);
+            var startVertexIdx = _vertices.Index;
+            AppendLine(a, b, thickness, color);
+            _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, 2));
+        }
+
+        private void AppendQuad(Vector2 min, Vector2 max, Vector2 uvMin, Vector2 uvMax, Color color)
+        {
+            
 
             var a = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(min.X, min.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMin.X, uvMin.Y));
             var b = new VertexPositionColorTexture(new Microsoft.Xna.Framework.Vector3(max.X, min.Y, 0), color, new Microsoft.Xna.Framework.Vector2(uvMax.X, uvMin.Y));

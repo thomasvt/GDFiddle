@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 
 namespace GDFiddle.UI.Controls
 {
@@ -20,9 +19,9 @@ namespace GDFiddle.UI.Controls
             return Content?.DoArrange(new RectangleF(Vector2.Zero, parentAvailableSize)) ?? Vector2.Zero;
         }
 
-        public override void Render(GuiRenderer guiRenderer)
+        protected override void Render(GuiRenderer guiRenderer)
         {
-            Content?.Render(guiRenderer);
+            Content?.DoRender(guiRenderer);
         }
 
         public Control? Content

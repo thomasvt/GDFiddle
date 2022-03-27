@@ -148,13 +148,12 @@ namespace GDFiddle.UI.Text
             }
         }
 
-        public Vector2 Measure(string text)
+        public Vector2 Measure(ReadOnlySpan<char> text)
         {
             var width = 0;
             var previousCharCode = (ushort)0;
-            for (var i = 0; i < text.Length; i++)
+            foreach (var code in text)
             {
-                var code = (ushort)char.ConvertToUtf32(text, i);
                 if (!Glyphs.TryGetValue(code, out var glyph))
                 {
                     if (!Glyphs.TryGetValue('?', out glyph))

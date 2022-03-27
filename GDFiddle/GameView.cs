@@ -29,7 +29,7 @@ namespace GDFiddle
             _messageBus.Subscribe<GameOpened>(opened => Game = opened.Game);
         }
 
-        public override void Render(GuiRenderer guiRenderer)
+        protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
             var gameFrame = RenderGame(ArrangedSize);

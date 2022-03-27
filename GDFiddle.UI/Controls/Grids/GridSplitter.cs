@@ -77,7 +77,7 @@ namespace GDFiddle.UI.Controls.Grids
             if (_right.Amount < _right.MinLength)
                 _right.Amount = _right.MinLength;
 
-            _grid!.DoArrange(_grid.ArrangeArea);
+            _grid!.DoArrange(_grid.ArrangedArea);
         }
     }
 }

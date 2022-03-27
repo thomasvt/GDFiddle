@@ -2,6 +2,7 @@
 using GDFiddle.Editor;
 using GDFiddle.Framework.Messaging;
 using GDFiddle.Games;
+using GDFiddle.MonoGamePlatform;
 using GDFiddle.UI;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework;
@@ -18,15 +19,10 @@ namespace GDFiddle
     {
         private readonly GraphicsDeviceManager _gdm;
         private GUI? _gui;
-        private BasicEffect? _effect;
         private readonly IMessageBus _messageBus;
         private MouseState _previousMouseState;
         private GDFiddleGame _game;
-        private readonly RasterizerState _rasterizerState = new()
-        {
-            CullMode = CullMode.None,
-            ScissorTestEnable = true
-        };
+        private CommandRenderer _commandRenderer;
 
         private KeyboardState _previousKeyboardState;
 
@@ -38,6 +34,8 @@ namespace GDFiddle
             Window.AllowUserResizing = true;
             Window.ClientSizeChanged += OnResize;
             Window.TextInput += (sender, args) => _gui?.ProcessTextInput(args.Key, args.Character);
+            Window.KeyUp += (sender, args) => _gui?.ProcessKeyUp(args.Key);
+            Window.KeyDown += (sender, args) => _gui?.ProcessKeyDown(args.Key);
         }
 
         private void OnResize(object? sender, EventArgs e)
@@ -53,7 +51,7 @@ namespace GDFiddle
             _gdm.PreferredBackBufferHeight = 900;
             _gdm.ApplyChanges();
 
-            _effect = new BasicEffect(GraphicsDevice);
+            _commandRenderer = new CommandRenderer(GraphicsDevice);
 
             CreateEditorGui();
             CreateGame();
@@ -92,37 +90,7 @@ namespace GDFiddle
             GraphicsDevice.Clear(new Color(10, 10, 10));
 
             var renderCommands = _gui!.Render(GetViewArea());
-            Render(renderCommands);
-        }
-
-        private void Render(RenderData renderCommands)
-        {
-            _effect!.World = Matrix.Identity;
-            _effect.Projection = Matrix.CreateOrthographicOffCenter(0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height, 0, 0.1f, 5);
-            _effect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), new Vector3(0, 0, 0), Vector3.UnitY);
-            _effect.VertexColorEnabled = true;
-            GraphicsDevice.RasterizerState = _rasterizerState;
-            GraphicsDevice.BlendState = BlendState.NonPremultiplied;
-            GraphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
-
-            foreach (var command in renderCommands.RenderCommands)
-            {
-                GraphicsDevice.ScissorRectangle = new Microsoft.Xna.Framework.Rectangle((int)command.ScissorRectangle.Location.X, (int)command.ScissorRectangle.Location.Y, (int)(Math.Ceiling(command.ScissorRectangle.Size.X)), (int)(Math.Ceiling(command.ScissorRectangle.Size.Y)));
-                _effect.World = Matrix.CreateTranslation(command.ScissorRectangle.Location.X, command.ScissorRectangle.Location.Y, 0f);
-                if (command.Texture != null)
-                {
-                    _effect.TextureEnabled = true;
-                    _effect.Texture = command.Texture;
-                }
-                else
-                {
-                    _effect.TextureEnabled = false;
-                }
-
-                _effect.CurrentTechnique.Passes[0].Apply();
-
-                GraphicsDevice.DrawUserPrimitives(PrimitiveType.TriangleList, renderCommands.Vertices, command.VertexOffset, command.TriangleCount);
-            }
+            _commandRenderer.Render(renderCommands);
         }
 
         private Rectangle GetViewArea()
@@ -143,7 +111,7 @@ namespace GDFiddle
 
         protected override void Dispose(bool disposing)
         {
-            _effect?.Dispose();
+            _commandRenderer.Dispose();
         }
     }
 }

@@ -1,13 +1,13 @@
 ﻿namespace GDFiddle.UI.Controls.Grids
 {
     /// <summary>
-    /// Calculates actual offsets and sized of the parts, based on GridLengths using Star and Pixel length-systems.
+    /// Calculates actual offsets and sizes of subcontrols by distributing a total size over them according to a distribution configuration, based on GridLengths using Star and Pixel length-systems.
     /// </summary>
-    internal class GridPartSizeCalculator
+    internal class GridChildDistributor
     {
         private float _totalSize;
 
-        public GridPartSizeCalculator()
+        public GridChildDistributor()
         {
             PartDefinitions = new List<GridLength>();
         }

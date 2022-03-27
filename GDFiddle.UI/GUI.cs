@@ -32,6 +32,16 @@ namespace GDFiddle.UI
             FocusedControl?.OnTextInput(pressedKey, typedCharacter);
         }
 
+        public void ProcessKeyDown(Keys pressedKey)
+        {
+            FocusedControl?.OnKeyDown(pressedKey);
+        }
+
+        public void ProcessKeyUp(Keys pressedKey)
+        {
+            FocusedControl?.OnKeyUp(pressedKey);
+        }
+
         private void ProcessMouse(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
             if (_mouseCapturer != null)
@@ -82,7 +92,7 @@ namespace GDFiddle.UI
         public RenderData Render(Rectangle viewArea)
         {
             _guiRenderer.BeginFrame(new RectangleF(viewArea.X, viewArea.Y, viewArea.Width, viewArea.Height));
-            Root?.Render(_guiRenderer);
+            Root?.DoRender(_guiRenderer);
             return _guiRenderer.GetRenderData();
         }
 
@@ -118,7 +128,10 @@ namespace GDFiddle.UI
 
         public void SwitchFocusTo(Control? control) // TODO a deleted Textbox in PropertiesPanel is still focussed -> put all child controls in collection in baseclass and add remove logic to remove focus upon delete.
         {
-            if (control?.IsFocusable != true)
+            if (control == FocusedControl)
+                return;
+
+            if (control is {IsFocusable: false})
                 throw new ArgumentException(nameof(control), "control is not focusable.");
 
             FocusedControl?.UnfocusInternal();

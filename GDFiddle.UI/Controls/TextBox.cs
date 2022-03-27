@@ -1,48 +1,133 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System.Diagnostics;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Vector2 = System.Numerics.Vector2;
 
 namespace GDFiddle.UI.Controls
 {
     /// <summary>
-    /// Like a common Textbox, but behaves a little different by ignoring the Text propery while in edit mode (keyboard focus), even though the app may be writing to Text each game frame.
+    /// Like a common Textbox, but behaves a little different by ignoring the Text property while in edit mode (keyboard focus), even though the app may be writing to Text each game frame.
     /// </summary>
     public class TextBox : Control
     {
+        private readonly Stopwatch _carretBlinkStopwatch;
+        private int _caretIndex;
+        private string _inputText;
+        public const float Padding = 2f;
+
         public TextBox()
         {
             IsFocusable = true;
+            Text = string.Empty;
+            _inputText = string.Empty;
+            _caretIndex = 0;
+            _carretBlinkStopwatch = new Stopwatch();
         }
 
-        public override void Render(GuiRenderer guiRenderer)
+        protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
             guiRenderer.DrawRectangle(new Vector2(0,0), ArrangedSize, null, IsFocused ? Color.Yellow : Color.White);
             if (IsFocused)
             {
-                guiRenderer.DrawText(2, 2, InputText, Color.White, Font);
+                guiRenderer.DrawText(Padding, Padding, InputText, Color.White, Font);
+                if (_carretBlinkStopwatch.ElapsedMilliseconds % 1000 < 500)
+                {
+                    var carretX = Font.Measure(InputText.AsSpan(0, CaretIndex)).X + Padding;
+                    guiRenderer.DrawLine(new Vector2(carretX, Padding), new Vector2(carretX, ArrangedSize.Y - Padding), 1f, Color.White);
+                }
             }
             else
             {
-                guiRenderer.DrawText(2, 2, Text, Color.White, Font);
+                guiRenderer.DrawText(Padding, Padding, Text, Color.White, Font);
             }
         }
 
-        
-        public override void OnTextInput(Keys pressedKey, char typedCharacter)
+        protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
-            
+            return new Vector2(parentAvailableSize.X, Font.LineHeight + Padding * 2);
+        }
+
+
+        internal override void OnTextInput(Keys pressedKey, char typedCharacter)
+        {
+            switch (pressedKey)
+            {
+                case Keys.Left: CaretIndex--; break; // arrows are rejected in TextInput code in MonoGame, they should though :(
+                case Keys.Right: CaretIndex++; break; // arrows don't work
+                case Keys.Escape: Unfocus(); break;
+                case Keys.Delete: if (CaretIndex < InputText.Length) InputText = InputText.Remove(CaretIndex, 1); break;
+                
+                case Keys.Back:
+                    if (CaretIndex > 0)
+                    {
+                        var caret = CaretIndex-1;
+                        InputText = InputText.Remove(caret, 1);
+                        CaretIndex = caret; // use temp var to bypass coercion in property setters and shift 2 position to left when caret at end of string.
+                    }
+                    break;
+                default:
+                    InputText = InputText.Insert(CaretIndex, typedCharacter.ToString());
+                    CaretIndex++;
+                    break;
+            }
+        }
+
+        internal override void OnKeyDown(Keys pressedKey)
+        {
+            // All keys should be processed in OnTextInput, so they support the OS driven repeat delay, but MonoGame filters out some keys, so we have to do a poor man's solution here:
+            switch (pressedKey)
+            {
+                case Keys.Left: CaretIndex--; _carretBlinkStopwatch.Restart(); break;
+                case Keys.Right: CaretIndex++; _carretBlinkStopwatch.Restart(); break;
+                case Keys.Home: CaretIndex = 0; _carretBlinkStopwatch.Restart(); break;
+                case Keys.End: CaretIndex = InputText.Length; _carretBlinkStopwatch.Restart(); break;
+            }
         }
 
         protected override void OnFocus()
         {
+            _carretBlinkStopwatch.Start();
             InputText = Text;
+            CaretIndex = InputText.Length;
         }
 
-        public string Text { get; set; } = string.Empty;
+        public string Text { get; set; }
 
-        public string InputText { get; private set; }
+        public string InputText
+        {
+            get => _inputText;
+            private set
+            {
+                if (_inputText == value)
+                    return;
 
-        public event Action<string> InputCompleted;
+                _inputText = value;
+                CoerceCaretIndex();
+            }
+        }
+
+        public int CaretIndex
+        {
+            get => _caretIndex;
+            set
+            {
+                if (_caretIndex == value)
+                    return;
+
+                _caretIndex = value;
+                CoerceCaretIndex();
+            }
+        }
+
+        private void CoerceCaretIndex()
+        {
+            if (CaretIndex < 0)
+                CaretIndex = 0;
+            else if (CaretIndex > InputText.Length)
+                CaretIndex = InputText.Length;
+        }
+
+        public event Action<string>? InputCompleted;
     }
 }

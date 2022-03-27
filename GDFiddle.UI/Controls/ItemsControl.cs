@@ -35,7 +35,7 @@ namespace GDFiddle.UI.Controls
 
         public override Control? GetControlAt(Vector2 position)
         {
-            var hitItem = Items.FirstOrDefault(item => item.ArrangeArea.Contains(position));
+            var hitItem = Items.FirstOrDefault(item => item.ArrangedArea.Contains(position));
             if (hitItem == null)
                 return this;
 
@@ -43,13 +43,12 @@ namespace GDFiddle.UI.Controls
             return hitItem.GetControlAt(position - offset);
         }
 
-        public override void Render(GuiRenderer guiRenderer)
+        protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
             foreach (var item in Items)
             {
-                using var scope = guiRenderer.PushSubArea(item.ArrangeArea);
-                item.Render(guiRenderer);
+                item.DoRender(guiRenderer);
             }
         }
 

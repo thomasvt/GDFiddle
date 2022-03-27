@@ -4,14 +4,14 @@ namespace GDFiddle.UI.Controls.Grids
 {
     public class Grid : Control
     {
-        private readonly GridPartSizeCalculator _columnDistributor;
-        private readonly GridPartSizeCalculator _rowDistributor;
+        private readonly GridChildDistributor _columnDistributor;
+        private readonly GridChildDistributor _rowDistributor;
 
         public Grid()
         {
             Children = new GridChildCollection(this);
-            _columnDistributor = new GridPartSizeCalculator();
-            _rowDistributor = new GridPartSizeCalculator();
+            _columnDistributor = new GridChildDistributor();
+            _rowDistributor = new GridChildDistributor();
         }
 
         protected override Vector2 Arrange(Vector2 parentAvailableSize)
@@ -29,14 +29,13 @@ namespace GDFiddle.UI.Controls.Grids
             return parentAvailableSize;
         }
 
-        public override void Render(GuiRenderer guiRenderer)
+        protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
             foreach (var child in Children)
             {
                 var control = child.Control;
-                using var scope = guiRenderer.PushSubArea(control.ArrangeArea);
-                control.Render(guiRenderer);
+                control.DoRender(guiRenderer);
             }
         }
 

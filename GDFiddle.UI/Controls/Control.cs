@@ -15,12 +15,18 @@ namespace GDFiddle.UI.Controls
         private GUI? _gui;
         private Font? _font;
 
-        public virtual void Render(GuiRenderer guiRenderer)
+        protected virtual void Render(GuiRenderer guiRenderer)
         {
             if (Background.HasValue)
             {
                 guiRenderer.DrawRectangle(Vector2.Zero, ArrangedSize, Background.Value, null);
             }
+        }
+
+        public void DoRender(GuiRenderer guiRenderer)
+        {
+            using var scope = guiRenderer.PushSubArea(ArrangedArea);
+            Render(guiRenderer);
         }
 
         public virtual Control? GetControlAt(Vector2 position)
@@ -58,7 +64,15 @@ namespace GDFiddle.UI.Controls
         {
         }
 
-        public virtual void OnTextInput(Keys pressedKey, char typedCharacter)
+        internal virtual void OnTextInput(Keys pressedKey, char typedCharacter)
+        {
+        }
+
+        internal virtual void OnKeyUp(Keys pressedKey)
+        {
+        }
+
+        internal virtual void OnKeyDown(Keys pressedKey)
         {
         }
 
@@ -90,12 +104,6 @@ namespace GDFiddle.UI.Controls
             get => _gui ?? _parent!.GUI;
             internal set => _gui = value;
         }
-
-        public Vector2 ArrangedSize { get; private set; }
-        internal Vector2 OffsetFromParent { get; private set; }
-        internal RectangleF ArrangeArea => new(OffsetFromParent, ArrangedSize);
-
-        public event Action<Control?>? ParentChanged;
 
         /// <summary>
         /// Reset font to GUI's default.
@@ -147,6 +155,21 @@ namespace GDFiddle.UI.Controls
         public bool IsFocusable { get; set; }
 
         public bool IsFocused { get; set; }
+
+        /// <summary>
+        /// The size of this control in pixels, as calculated by the Arrange phase while rendering.
+        /// </summary>
+        public Vector2 ArrangedSize { get; private set; }
+        /// <summary>
+        /// The topleft point of the AABB of this control, as calculated by the parent during the Arrange phase while rendering.
+        /// </summary>
+        internal Vector2 OffsetFromParent { get; private set; }
+        /// <summary>
+        /// The Combination of <see cref="OffsetFromParent"/> and <see cref="ArrangedSize"/> into a <see cref="RectangleF"/>.
+        /// </summary>
+        internal RectangleF ArrangedArea => new(OffsetFromParent, ArrangedSize);
+
+        public event Action<Control?>? ParentChanged;
     }
 }
 
