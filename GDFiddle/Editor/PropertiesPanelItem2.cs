@@ -35,22 +35,12 @@ namespace GDFiddle.Editor
             parentAvailableSize.Y = MathF.Max(MathF.Max(textbox1Size.Y, textbox2Size.Y), labelSize.Y);
             return parentAvailableSize;
         }
-
-        public override Control? GetControlAt(Vector2 position)
+        
+        protected override IEnumerable<Control> GetVisibleChildren()
         {
-            if (position.X < ArrangedSize.X * LabelWidthPercentage)
-                return null;
-            if (position.X < ArrangedSize.X * (LabelWidthPercentage + FieldWidthPercentage))
-                return _textBox1;
-            return _textBox2;
-        }
-
-        protected override void Render(GuiRenderer guiRenderer)
-        {
-            base.Render(guiRenderer);
-            _label.DoRender(guiRenderer);
-            _textBox1.DoRender(guiRenderer);
-            _textBox2.DoRender(guiRenderer);
+            yield return _label;
+            yield return _textBox1;
+            yield return _textBox2;
         }
 
         public string Value1 { get => _textBox1.Text; set => _textBox1.Text = value; }

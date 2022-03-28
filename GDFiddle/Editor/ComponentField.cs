@@ -1,6 +1,9 @@
 ﻿
 namespace GDFiddle.Editor
 {
+    /// <summary>
+    /// Inspecion/reflection data about a component field. Used by the Editor's <see cref="PropertiesPanel"/>.
+    /// </summary>
     internal class ComponentField
     {
         public ComponentField(Type type, string label, Func<object, object?> getter, Action<object, object?> setter)

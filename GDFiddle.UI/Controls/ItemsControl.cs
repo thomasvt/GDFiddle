@@ -32,24 +32,10 @@ namespace GDFiddle.UI.Controls
 
             return neededSize;
         }
-
-        public override Control? GetControlAt(Vector2 position)
+        
+        protected override IEnumerable<Control> GetVisibleChildren()
         {
-            var hitItem = Items.FirstOrDefault(item => item.ArrangedArea.Contains(position));
-            if (hitItem == null)
-                return this;
-
-            var offset = hitItem.OffsetFromParent;
-            return hitItem.GetControlAt(position - offset);
-        }
-
-        protected override void Render(GuiRenderer guiRenderer)
-        {
-            base.Render(guiRenderer);
-            foreach (var item in Items)
-            {
-                item.DoRender(guiRenderer);
-            }
+            return Items;
         }
 
         public ItemCollection Items { get; }

@@ -9,19 +9,15 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _content;
 
-        public override Control? GetControlAt(Vector2 position)
-        {
-            return Content?.GetControlAt(position);
-        }
-
         protected override Vector2 Arrange(Vector2 parentAvailableSize)
         {
             return Content?.DoArrange(new RectangleF(Vector2.Zero, parentAvailableSize)) ?? Vector2.Zero;
         }
 
-        protected override void Render(GuiRenderer guiRenderer)
+        protected override IEnumerable<Control> GetVisibleChildren()
         {
-            Content?.DoRender(guiRenderer);
+            if (Content != null)
+                yield return Content;
         }
 
         public Control? Content

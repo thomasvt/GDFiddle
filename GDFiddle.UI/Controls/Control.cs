@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.SymbolStore;
+﻿using System.Reflection.Metadata.Ecma335;
 using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
@@ -18,19 +18,26 @@ namespace GDFiddle.UI.Controls
         protected virtual void Render(GuiRenderer guiRenderer)
         {
             if (Background.HasValue)
-            {
                 guiRenderer.DrawRectangle(Vector2.Zero, ArrangedSize, Background.Value, null);
-            }
         }
 
         public void DoRender(GuiRenderer guiRenderer)
         {
             using var scope = guiRenderer.PushSubArea(ArrangedArea);
             Render(guiRenderer);
+            foreach (var child in GetVisibleChildren())
+            {
+                child.DoRender(guiRenderer);
+            }
         }
 
-        public virtual Control? GetControlAt(Vector2 position)
+        public Control? GetControlAt(Vector2 position)
         {
+            foreach (var child in GetVisibleChildren())
+            {
+                if (child.ArrangedArea.Contains(position))
+                    return child.GetControlAt(position - child.OffsetFromParent);
+            }
             return this;
         }
 
@@ -74,6 +81,11 @@ namespace GDFiddle.UI.Controls
 
         internal virtual void OnKeyDown(Keys pressedKey)
         {
+        }
+
+        protected virtual IEnumerable<Control> GetVisibleChildren()
+        {
+            yield break;
         }
 
         public bool IsMouseOver { get; internal set; }
