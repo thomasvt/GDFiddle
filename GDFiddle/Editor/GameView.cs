@@ -6,7 +6,7 @@ using GDFiddle.UI.Controls;
 using Microsoft.Xna.Framework.Graphics;
 using Color = Microsoft.Xna.Framework.Color;
 
-namespace GDFiddle
+namespace GDFiddle.Editor
 {
     internal class GameView : Control, IDisposable
     {
@@ -20,6 +20,7 @@ namespace GDFiddle
             _graphicsDevice = graphicsDevice;
             _messageBus = messageBus;
             SelectionColor = new Color(250, 206, 50);
+            IsMouseInteractive = true;
 
             SubscribeMessageHandlers();
         }

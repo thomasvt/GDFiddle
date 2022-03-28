@@ -31,14 +31,20 @@ namespace GDFiddle.UI.Controls
             }
         }
 
-        public Control? GetControlAt(Vector2 position)
+        public Control? GetControlAt(Vector2 position, bool mouseInteractiveOnly)
         {
             foreach (var child in GetVisibleChildren())
             {
                 if (child.ArrangedArea.Contains(position))
-                    return child.GetControlAt(position - child.OffsetFromParent);
+                {
+                    var result = child.GetControlAt(position - child.ArrangedOffset, mouseInteractiveOnly);
+                    if (result != null)
+                        return result;
+                }
             }
-            return this;
+            if (!mouseInteractiveOnly || IsMouseInteractive)
+                return this;
+            return null;
         }
 
         /// <summary>
@@ -50,7 +56,7 @@ namespace GDFiddle.UI.Controls
             var size = Arrange(availableSize);
             
             ArrangedSize = size;
-            OffsetFromParent = areaInParent.Location;
+            ArrangedOffset = areaInParent.Location;
             return size;
         }
 
@@ -87,6 +93,7 @@ namespace GDFiddle.UI.Controls
         {
             yield break;
         }
+
 
         public bool IsMouseOver { get; internal set; }
 
@@ -164,27 +171,32 @@ namespace GDFiddle.UI.Controls
             set => _font = value;
         }
 
+
         public bool IsFocusable { get; set; }
 
         public bool IsFocused { get; set; }
 
         /// <summary>
-        /// The size of this control in pixels, as calculated by the Arrange phase while rendering.
+        /// The size of this control in pixels, as assigned by the parent control during the last Arrange phase.
         /// </summary>
         public Vector2 ArrangedSize { get; private set; }
+
         /// <summary>
-        /// The topleft point of the AABB of this control, as calculated by the parent during the Arrange phase while rendering.
+        /// The topleft point of the AABB of this control in relation with the parent control, as assigned by the parent during the Arrange phase.
         /// </summary>
-        internal Vector2 OffsetFromParent { get; private set; }
+        internal Vector2 ArrangedOffset { get; private set; }
+
         /// <summary>
-        /// The Combination of <see cref="OffsetFromParent"/> and <see cref="ArrangedSize"/> into a <see cref="RectangleF"/>.
+        /// The Combination of <see cref="ArrangedOffset"/> and <see cref="ArrangedSize"/> into a <see cref="RectangleF"/>.
         /// </summary>
-        internal RectangleF ArrangedArea => new(OffsetFromParent, ArrangedSize);
+        internal RectangleF ArrangedArea => new(ArrangedOffset, ArrangedSize);
 
         /// <summary>
         /// Is this control attached to a GUI?
         /// </summary>
         public bool IsAttached => GUI != null;
+
+        public bool IsMouseInteractive { get; set; }
 
         public event Action<Control?>? ParentChanged;
 
@@ -195,6 +207,20 @@ namespace GDFiddle.UI.Controls
         {
             Parent = null;
             GUI = null;
+        }
+
+        /// <summary>
+        /// Links this control to a parent.
+        /// </summary>
+        internal void Attach(Control parent)
+        {
+            Parent = parent;
+        }
+
+        public Vector2 ScreenToLocal(Vector2 position)
+        {
+            position -= ArrangedOffset;
+            return Parent?.ScreenToLocal(position) ?? position;
         }
     }
 }

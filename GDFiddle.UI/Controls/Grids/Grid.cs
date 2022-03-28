@@ -9,7 +9,7 @@ namespace GDFiddle.UI.Controls.Grids
 
         public Grid()
         {
-            Children = new GridChildCollection(this);
+            Children = new ItemWithMetaCollection<GridProperties>(this);
             _columnDistributor = new GridChildDistributor();
             _rowDistributor = new GridChildDistributor();
         }
@@ -21,8 +21,8 @@ namespace GDFiddle.UI.Controls.Grids
 
             foreach (var child in Children)
             {
-                var horizontalActual = _columnDistributor.GetActualLayout(child.GridProperties.Column);
-                var verticalActual = _rowDistributor.GetActualLayout(child.GridProperties.Row);
+                var horizontalActual = _columnDistributor.GetActualLayout(child.MetaData.Column);
+                var verticalActual = _rowDistributor.GetActualLayout(child.MetaData.Row);
                 child.Control.DoArrange(new RectangleF(horizontalActual.Offset, verticalActual.Offset, horizontalActual.Size, verticalActual.Size));
             }
 
@@ -34,7 +34,7 @@ namespace GDFiddle.UI.Controls.Grids
             return Children.Select(c => c.Control);
         }
 
-        public GridChildCollection Children { get; }
+        public ItemWithMetaCollection<GridProperties> Children { get; }
 
         public List<GridLength> ColumnDefinitions => _columnDistributor.PartDefinitions;
         public List<GridLength> RowDefinitions => _rowDistributor.PartDefinitions;

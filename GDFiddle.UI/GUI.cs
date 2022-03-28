@@ -61,7 +61,7 @@ namespace GDFiddle.UI
             }
 
             var mouseOverControl = viewArea.Contains(new Point((int) mousePosition.X, (int) mousePosition.Y))
-                ? Root?.GetControlAt(mousePosition)
+                ? Root?.GetControlAt(mousePosition, true)
                 : null;
             if (mouseOverControl != _mouseOverControl)
             {
@@ -87,13 +87,14 @@ namespace GDFiddle.UI
 
         private void LetControlProcessMouse(Control control, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
+            var localMousePosition = control.ScreenToLocal(mousePosition);
             if (mouseWentDown)
             {
                 SwitchFocusTo(control.IsFocusable ? control : null);
-                control.OnMouseDown(mousePosition);
+                control.OnMouseDown(localMousePosition);
             }
-            if (mouseWentUp) control.OnMouseUp(mousePosition);
-            if (_previousMousePosition != mousePosition) control.OnMouseMove(_previousMousePosition, mousePosition);
+            if (mouseWentUp) control.OnMouseUp(localMousePosition);
+            if (_previousMousePosition != mousePosition) control.OnMouseMove(_previousMousePosition, localMousePosition);
             MouseCursor = control.MouseCursor;
         }
 

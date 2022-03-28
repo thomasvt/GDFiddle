@@ -12,6 +12,7 @@ namespace GDFiddle.UI.Controls.Grids
 
         public GridSplitter()
         {
+            IsMouseInteractive = true;
             MouseCursor = Microsoft.Xna.Framework.Input.MouseCursor.SizeWE;
             ParentChanged += parent =>
             {
@@ -28,7 +29,7 @@ namespace GDFiddle.UI.Controls.Grids
         private void ConfigureGridSplitting(Grid grid)
         {
             _grid = grid;
-            var gridProperties = grid.Children.GetGridProperties(this);
+            var gridProperties = grid.Children.GetMetaData(this);
             var splitterColumn = gridProperties.Column;
             if (splitterColumn <= 0 || splitterColumn >= grid.ColumnDefinitions.Count - 1)
                 throw new Exception($"A {nameof(GridSplitter)} must have at least 1 column on either of its sides.");

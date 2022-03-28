@@ -58,6 +58,10 @@ namespace GDFiddle.UI
                 AppendLine(c, d, 1f, borderColor.Value);
                 AppendLine(d, a, 1f, borderColor.Value);
             }
+
+            if (startVertexIdx == _vertices.Index)
+                return;
+
             _renderCommands.Add(new RenderCommand(_clipAreaStack.Peek(), startVertexIdx, (_vertices.Index - startVertexIdx) / 3));
         }
 

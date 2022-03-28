@@ -1,16 +1,7 @@
 ﻿namespace GDFiddle.UI.Controls.Grids
 {
-    public class GridProperties
+    public record GridProperties(int Column, int Row)
     {
-        public GridProperties(int column, int row)
-        {
-            Column = column;
-            Row = row;
-        }
-
-        public int Column { get; set; }
-        public int Row { get; set; }
-
         public static GridProperties Default() => new(0,0);
     }
 }

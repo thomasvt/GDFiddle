@@ -26,6 +26,7 @@ namespace GDFiddle.UI.Controls
             _caretIndex = 0;
             _carretBlinkStopwatch = new Stopwatch();
             MouseCursor = MouseCursor.IBeam;
+            IsMouseInteractive = true;
         }
 
         protected override void Render(GuiRenderer guiRenderer)
