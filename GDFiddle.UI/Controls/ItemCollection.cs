@@ -23,7 +23,7 @@ namespace GDFiddle.UI.Controls
         {
             foreach (var item in _items)
             {
-                item.Parent = null;
+                item.Detach();
             }
             _items.Clear();
         }

@@ -29,16 +29,25 @@ namespace GDFiddle.UI
 
         public void ProcessTextInput(Keys pressedKey, char typedCharacter)
         {
+            if (FocusedControl is {IsAttached: false })
+                SwitchFocusTo(null);
+
             FocusedControl?.OnTextInput(pressedKey, typedCharacter);
         }
 
         public void ProcessKeyDown(Keys pressedKey)
         {
+            if (FocusedControl is { IsAttached: false })
+                SwitchFocusTo(null);
+
             FocusedControl?.OnKeyDown(pressedKey);
         }
 
         public void ProcessKeyUp(Keys pressedKey)
         {
+            if (FocusedControl is { IsAttached: false })
+                SwitchFocusTo(null);
+
             FocusedControl?.OnKeyUp(pressedKey);
         }
 
@@ -125,7 +134,7 @@ namespace GDFiddle.UI
             }
         }
 
-        public void SwitchFocusTo(Control? control) // TODO a deleted Textbox in PropertiesPanel is still focussed -> put all child controls in collection in baseclass and add remove logic to remove focus upon delete.
+        public void SwitchFocusTo(Control? control)
         {
             if (control == FocusedControl)
                 return;

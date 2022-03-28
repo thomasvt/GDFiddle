@@ -24,6 +24,15 @@ namespace GDFiddle.UI.Controls.Grids
             control.Parent = _owner;
         }
 
+        public void Clear()
+        {
+            foreach (var container in _children)
+            {
+                container.Key.Detach();
+            }
+            _children.Clear();
+        }
+
         /// <summary>
         /// Returns the GridProperties instance associated with a child.
         /// </summary>

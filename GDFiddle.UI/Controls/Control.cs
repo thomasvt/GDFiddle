@@ -181,7 +181,21 @@ namespace GDFiddle.UI.Controls
         /// </summary>
         internal RectangleF ArrangedArea => new(OffsetFromParent, ArrangedSize);
 
+        /// <summary>
+        /// Is this control attached to a GUI?
+        /// </summary>
+        public bool IsAttached => GUI != null;
+
         public event Action<Control?>? ParentChanged;
+
+        /// <summary>
+        /// Removes the link to a parent and the owning GUI.
+        /// </summary>
+        internal void Detach()
+        {
+            Parent = null;
+            GUI = null;
+        }
     }
 }
 
