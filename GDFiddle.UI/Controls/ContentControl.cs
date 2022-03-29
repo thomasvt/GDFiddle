@@ -14,12 +14,12 @@ namespace GDFiddle.UI.Controls
             if (Content == null)
                 return Vector2.Zero;
 
-            return Content.DoMeasure(availableSize - Padding * 2);
+            return Content.DoMeasure(availableSize - Padding * 2) + Margin * 2;
         }
 
         protected override void Arrange(Vector2 assignedSize)
         {
-            Content?.DoArrange(new RectangleF(Padding, assignedSize - Padding * 2));
+            Content?.DoArrange(new RectangleF(Padding + Margin, assignedSize - (Padding - Margin) * 2));
         }
 
         protected override IEnumerable<Control> GetVisibleChildren()
@@ -42,5 +42,6 @@ namespace GDFiddle.UI.Controls
         }
 
         public Vector2 Padding { get; set; }
+        public Vector2 Margin { get; set; }
     }
 }

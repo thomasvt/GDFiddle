@@ -73,12 +73,12 @@ namespace TestGame
 
         private Matrix3x2 GetViewTransform()
         {
-            return Matrix3x2.CreateTranslation(_renderer.LastFrameSize * 0.5f);
+            return Matrix3x2.CreateScale(2f) * Matrix3x2.CreateTranslation(_renderer.LastFrameSize * 0.5f);
         }
 
         private Matrix3x2 GetViewInvTransform()
         {
-            return Matrix3x2.CreateTranslation(_renderer.LastFrameSize * -0.5f);
+            return Matrix3x2.CreateTranslation(_renderer.LastFrameSize * -0.5f) * Matrix3x2.CreateScale(0.5f);
         }
     }
 }

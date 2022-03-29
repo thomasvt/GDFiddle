@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using GDFiddle.UI.Controls.Tabs;
 
 namespace GDFiddle.UI.Controls
 {
@@ -52,6 +53,11 @@ namespace GDFiddle.UI.Controls
             if (!_children.TryGetValue(child, out var result))
                 throw new ArgumentOutOfRangeException(nameof(child), $"That is not a child of this Grid");
             return result.MetaData;
+        }
+
+        public ItemWithMetaData<TMetaData> Get(Control control)
+        {
+            return _children[control];
         }
 
         public int Count => _children.Count;

@@ -30,6 +30,10 @@ namespace GDFiddle.UI.Controls
             }
         }
 
+        /// <summary>
+        /// Gets the deepest child control at the given position.
+        /// </summary>
+        /// <param name="mouseInteractiveOnly">Return the deepest control with IsMouseInteractive set to true.</param>
         public Control? GetControlAt(Vector2 position, bool mouseInteractiveOnly)
         {
             foreach (var child in GetVisibleChildren())
