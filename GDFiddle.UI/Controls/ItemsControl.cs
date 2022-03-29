@@ -14,15 +14,16 @@ namespace GDFiddle.UI.Controls
 
         protected override Vector2 Measure(Vector2 availableSize)
         {
-            var totalSize = Vector2.Zero;
+            var totalSize = new Vector2(0, -Spacing); // compensate for counting 1 spacing too many in the loop.
             var defaultSize = new Vector2(availableSize.X, DefaultItemHeight);
             foreach (var item in Items)
             {
                 var itemSize = item.DoMeasure(defaultSize);
                 if (itemSize.X > totalSize.X)
                     totalSize.X = itemSize.X;
-                totalSize.Y += itemSize.Y;
+                totalSize.Y += itemSize.Y + Spacing;
             }
+
             return totalSize;
         }
 
@@ -34,7 +35,7 @@ namespace GDFiddle.UI.Controls
             {
                 item.DoArrange(new RectangleF(childOffset, new Vector2(assignedSize.X, item.DesiredSize.Y)));
 
-                childOffset.Y += item.DesiredSize.Y;
+                childOffset.Y += item.DesiredSize.Y + Spacing;
             }
         }
         
@@ -45,5 +46,10 @@ namespace GDFiddle.UI.Controls
 
         public ItemCollection Items { get; }
         public float DefaultItemHeight { get; set; } = 24f;
+
+        /// <summary>
+        /// Space between items.
+        /// </summary>
+        public float Spacing { get; set; }
     }
 }

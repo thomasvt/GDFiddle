@@ -9,9 +9,10 @@ namespace GDFiddle.Editor
     /// </summary>
     internal class PropertiesPanelItem2 : Control
     {
-        private const float LabelWidthPercentage = 0.4f;
+        private const float LabelWidthPercentage = 0.3f;
         private const int FieldCount = 2;
         private const float FieldWidthPercentage = (1 - LabelWidthPercentage) / FieldCount;
+        private const float Padding = 8f;
 
         private readonly TextBox _textBox1;
         private readonly TextBox _textBox2;
@@ -28,18 +29,19 @@ namespace GDFiddle.Editor
 
         protected override Vector2 Measure(Vector2 availableSize)
         {
-            _label.DoMeasure(new Vector2(availableSize.X * LabelWidthPercentage, availableSize.Y));
-            _textBox1.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage, availableSize.Y));
-            _textBox2.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage, availableSize.Y));
+            _label.DoMeasure(new Vector2(availableSize.X * LabelWidthPercentage - Padding, availableSize.Y));
+            _textBox1.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage - Padding, availableSize.Y));
+            _textBox2.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage - Padding, availableSize.Y));
 
             return new Vector2(availableSize.X, MathF.Max(MathF.Max(_label.DesiredSize.Y, _textBox1.DesiredSize.Y), _textBox2.DesiredSize.Y));
         }
 
         protected override void Arrange(Vector2 assignedSize)
         {
-            _label.DoArrange(new RectangleF(0, 0, assignedSize.X * LabelWidthPercentage, _label.DesiredSize.Y));
-            _textBox1.DoArrange(new RectangleF(assignedSize.X * LabelWidthPercentage, 0, assignedSize.X * FieldWidthPercentage, _textBox1.DesiredSize.Y));
-            _textBox2.DoArrange(new RectangleF(assignedSize.X * (LabelWidthPercentage + FieldWidthPercentage), 0, assignedSize.X * FieldWidthPercentage, _textBox2.DesiredSize.Y));
+            var labelWidth = assignedSize.X * LabelWidthPercentage;
+            _label.DoArrange(new RectangleF(labelWidth - _label.DesiredSize.X - Padding, (assignedSize.Y - _label.DesiredSize.Y) * 0.5f, assignedSize.X * LabelWidthPercentage, _label.DesiredSize.Y));
+            _textBox1.DoArrange(new RectangleF(assignedSize.X * LabelWidthPercentage, 0, assignedSize.X * FieldWidthPercentage - Padding, _textBox1.DesiredSize.Y));
+            _textBox2.DoArrange(new RectangleF(assignedSize.X * (LabelWidthPercentage + FieldWidthPercentage), 0, assignedSize.X * FieldWidthPercentage - Padding, _textBox2.DesiredSize.Y));
         }
         
         protected override IEnumerable<Control> GetVisibleChildren()

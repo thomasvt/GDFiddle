@@ -29,6 +29,11 @@ namespace GDFiddle.UI.Controls
             IsMouseInteractive = true;
         }
 
+        protected override Vector2 Measure(Vector2 availableSize)
+        {
+            return Font.Measure(Text) + new Vector2(Padding, Padding) * 2;
+        }
+
         protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
