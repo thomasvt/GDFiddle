@@ -11,7 +11,7 @@ namespace GDFiddle.UI.Controls
             guiRenderer.DrawText(0,0, Text, Foreground, Font);
         }
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
             return Font.Measure(Text);
         }

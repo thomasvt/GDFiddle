@@ -78,7 +78,9 @@ namespace GDFiddle.UI.Controls.Grids
             if (_right.Amount < _right.MinLength)
                 _right.Amount = _right.MinLength;
 
-            _grid!.DoArrange(_grid.ArrangedArea);
+            // recalculate grid children so the current frame will already show the changes (prevents some drag on the splitter)
+            _grid?.DoMeasure(_grid.ArrangedSize);
+            _grid?.DoArrange(_grid.ArrangedArea);
         }
     }
 }

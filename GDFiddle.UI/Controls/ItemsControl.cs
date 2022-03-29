@@ -12,25 +12,30 @@ namespace GDFiddle.UI.Controls
             Items = new ItemCollection(this);
         }
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
-            var neededSize = new Vector2(0, 0);
+            var totalSize = Vector2.Zero;
+            var defaultSize = new Vector2(availableSize.X, DefaultItemHeight);
+            foreach (var item in Items)
+            {
+                var itemSize = item.DoMeasure(defaultSize);
+                if (itemSize.X > totalSize.X)
+                    totalSize.X = itemSize.X;
+                totalSize.Y += itemSize.Y;
+            }
+            return totalSize;
+        }
+
+        protected override void Arrange(Vector2 assignedSize)
+        {
             var childOffset = new Vector2(0, 0);
-            var remainingSize = parentAvailableSize;
 
             foreach (var item in Items)
             {
-                var itemSize = item.DoArrange(new RectangleF(childOffset, parentAvailableSize));
+                item.DoArrange(new RectangleF(childOffset, new Vector2(assignedSize.X, item.DesiredSize.Y)));
 
-                if (itemSize.X > neededSize.X)
-                    neededSize.X = itemSize.X;
-
-                childOffset.Y += itemSize.Y;
-                remainingSize.Y -= itemSize.Y;
-                neededSize.Y += itemSize.Y;
+                childOffset.Y += item.DesiredSize.Y;
             }
-
-            return neededSize;
         }
         
         protected override IEnumerable<Control> GetVisibleChildren()
@@ -39,5 +44,6 @@ namespace GDFiddle.UI.Controls
         }
 
         public ItemCollection Items { get; }
+        public float DefaultItemHeight { get; set; } = 24f;
     }
 }

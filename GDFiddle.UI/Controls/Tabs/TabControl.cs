@@ -6,7 +6,7 @@ namespace GDFiddle.UI.Controls.Tabs
     public class TabControl : Control
     {
         private ItemWithMetaData<TabProperties>? _selectedTabPage;
-        private Vector2 HeaderButtonPadding = new(4f, 4f);
+        private readonly Vector2 _headerButtonPadding = new(4f, 4f);
 
         public TabControl()
         {
@@ -14,18 +14,41 @@ namespace GDFiddle.UI.Controls.Tabs
             IsMouseInteractive = true;
         }
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
-            var tabButtonX = 0f;
             foreach (var tabPage in TabPages)
             {
-                var size = tabPage.Control.DoArrange(new RectangleF(tabButtonX + HeaderButtonPadding.X, HeaderButtonPadding.Y, parentAvailableSize.X - tabButtonX, TabButtonHeight));
-                tabButtonX += size.X + HeaderButtonPadding.X * 2;
+                tabPage.Control.DoMeasure(new Vector2(availableSize.X, TabButtonHeight));
+            }
+
+            SelectedTabPage?.MetaData?.Body.DoMeasure(new Vector2(availableSize.X, availableSize.Y - TabButtonHeight));
+
+            return availableSize;
+        }
+
+        protected override void Arrange(Vector2 parentAvailableSize)
+        {
+            var tabButtonX = 0f;
+            foreach (var (control, _) in TabPages)
+            {
+                control.DoArrange(new RectangleF(tabButtonX, 0, control.DesiredSize.X, TabButtonHeight));
+                tabButtonX += control.DesiredSize.X;
             }
 
             SelectedTabPage?.MetaData?.Body.DoArrange(new RectangleF(0, TabButtonHeight, parentAvailableSize.X, parentAvailableSize.Y - TabButtonHeight));
+        }
 
-            return parentAvailableSize;
+        protected override void Render(GuiRenderer guiRenderer)
+        {
+            foreach (var tabPage in TabPages)
+            {
+                guiRenderer.DrawRectangle(tabPage.Control.ArrangedOffset, tabPage.Control.ArrangedSize, tabPage == SelectedTabPage ? SelectedTabBackground : Background, null);
+            }
+
+            if (SelectedTabPage?.MetaData == null)
+                return;
+
+            guiRenderer.DrawRectangle(new Vector2(0, TabButtonHeight), new Vector2(ArrangedSize.X, ArrangedSize.Y - TabButtonHeight), SelectedTabBackground, null);
         }
 
         protected override IEnumerable<Control> GetVisibleChildren()
@@ -41,24 +64,12 @@ namespace GDFiddle.UI.Controls.Tabs
             yield return SelectedTabPage.MetaData.Body;
         }
 
-        protected override void Render(GuiRenderer guiRenderer)
-        {
-            foreach (var tabPage in TabPages)
-            {
-                guiRenderer.DrawRectangle(tabPage.Control.ArrangedOffset - HeaderButtonPadding, tabPage.Control.ArrangedSize + HeaderButtonPadding * 2, tabPage == SelectedTabPage ? SelectedTabBackground : Background, null);
-            }
-
-            if (SelectedTabPage?.MetaData == null)
-                return;
-
-            guiRenderer.DrawRectangle(new Vector2(0, TabButtonHeight), new Vector2(ArrangedSize.X, ArrangedSize.Y - TabButtonHeight), SelectedTabBackground, null);
-        }
-
         public override void OnMouseDown(Vector2 mousePosition)
         {
+            var localMousePosition = ToLocalPosition(mousePosition);
             foreach (var tabPage in TabPages)
             {
-                if (tabPage.Control.ArrangedArea.Contains(mousePosition))
+                if (tabPage.Control.ArrangedArea.Contains(localMousePosition))
                 {
                     SelectedTabPage = tabPage;
                     return;

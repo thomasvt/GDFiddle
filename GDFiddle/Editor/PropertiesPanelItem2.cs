@@ -26,14 +26,20 @@ namespace GDFiddle.Editor
             _textBox2.InputCompleted += s => Value2Edited?.Invoke(s);
         }
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
-            var labelSize = _label.DoArrange(new RectangleF(0, 0, parentAvailableSize.X * LabelWidthPercentage, parentAvailableSize.Y));
-            var textbox1Size = _textBox1.DoArrange(new RectangleF(parentAvailableSize.X * LabelWidthPercentage, 0, parentAvailableSize.X * FieldWidthPercentage, parentAvailableSize.Y));
-            var textbox2Size = _textBox2.DoArrange(new RectangleF(parentAvailableSize.X * (LabelWidthPercentage + FieldWidthPercentage), 0, parentAvailableSize.X * FieldWidthPercentage, parentAvailableSize.Y));
+            _label.DoMeasure(new Vector2(availableSize.X * LabelWidthPercentage, availableSize.Y));
+            _textBox1.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage, availableSize.Y));
+            _textBox2.DoMeasure(new Vector2(availableSize.X * FieldWidthPercentage, availableSize.Y));
 
-            parentAvailableSize.Y = MathF.Max(MathF.Max(textbox1Size.Y, textbox2Size.Y), labelSize.Y);
-            return parentAvailableSize;
+            return new Vector2(availableSize.X, MathF.Max(MathF.Max(_label.DesiredSize.Y, _textBox1.DesiredSize.Y), _textBox2.DesiredSize.Y));
+        }
+
+        protected override void Arrange(Vector2 assignedSize)
+        {
+            _label.DoArrange(new RectangleF(0, 0, assignedSize.X * LabelWidthPercentage, _label.DesiredSize.Y));
+            _textBox1.DoArrange(new RectangleF(assignedSize.X * LabelWidthPercentage, 0, assignedSize.X * FieldWidthPercentage, _textBox1.DesiredSize.Y));
+            _textBox2.DoArrange(new RectangleF(assignedSize.X * (LabelWidthPercentage + FieldWidthPercentage), 0, assignedSize.X * FieldWidthPercentage, _textBox2.DesiredSize.Y));
         }
         
         protected override IEnumerable<Control> GetVisibleChildren()

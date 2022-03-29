@@ -1,5 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using GDFiddle.UI.Text;
+﻿using GDFiddle.UI.Text;
 using Microsoft.Xna.Framework.Input;
 using Color = Microsoft.Xna.Framework.Color;
 using Vector2 = System.Numerics.Vector2;
@@ -47,22 +46,29 @@ namespace GDFiddle.UI.Controls
             return null;
         }
 
+        public Vector2 DoMeasure(Vector2 availableSize)
+        {
+            DesiredSize = Measure(availableSize);
+            return DesiredSize;
+        }
+
+        protected virtual Vector2 Measure(Vector2 availableSize)
+        {
+            return availableSize;
+        }
+
         /// <summary>
         /// Makes the control arrange itself (and its children). Returns the size that it actually needs, which can be smaller or larger than the size provided by its parent.
         /// </summary>
-        public Vector2 DoArrange(RectangleF areaInParent)
+        public void DoArrange(RectangleF assignedArea)
         {
-            var availableSize = areaInParent.Size;
-            var size = Arrange(availableSize);
-            
-            ArrangedSize = size;
-            ArrangedOffset = areaInParent.Location;
-            return size;
+            ArrangedSize = assignedArea.Size;
+            ArrangedOffset = assignedArea.Location;
+            Arrange(assignedArea.Size);
         }
 
-        protected virtual Vector2 Arrange(Vector2 parentAvailableSize)
+        protected virtual void Arrange(Vector2 assignedSize)
         {
-            return parentAvailableSize;
         }
 
         public virtual void OnMouseDown(Vector2 mousePosition)
@@ -192,6 +198,11 @@ namespace GDFiddle.UI.Controls
         internal RectangleF ArrangedArea => new(ArrangedOffset, ArrangedSize);
 
         /// <summary>
+        /// The size this control would prefer to be (calculated by Measure)
+        /// </summary>
+        public Vector2 DesiredSize { get; private set; }
+
+        /// <summary>
         /// Is this control attached to a GUI?
         /// </summary>
         public bool IsAttached => GUI != null;
@@ -217,10 +228,13 @@ namespace GDFiddle.UI.Controls
             Parent = parent;
         }
 
-        public Vector2 ScreenToLocal(Vector2 position)
+        /// <summary>
+        /// Converts a screen pixel position to a control-local pixel position.
+        /// </summary>
+        public Vector2 ToLocalPosition(Vector2 position)
         {
             position -= ArrangedOffset;
-            return Parent?.ScreenToLocal(position) ?? position;
+            return Parent?.ToLocalPosition(position) ?? position;
         }
     }
 }

@@ -9,9 +9,14 @@ namespace GDFiddle.UI.Controls
     {
         private Control? _content;
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
-            return Content?.DoArrange(new RectangleF(Vector2.Zero, parentAvailableSize)) ?? Vector2.Zero;
+            return Content?.DoMeasure(availableSize) ?? Vector2.Zero;
+        }
+
+        protected override void Arrange(Vector2 assignedSize)
+        {
+            Content?.DoArrange(new RectangleF(Vector2.Zero, assignedSize));
         }
 
         protected override IEnumerable<Control> GetVisibleChildren()

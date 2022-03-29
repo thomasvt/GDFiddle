@@ -23,6 +23,7 @@ namespace GDFiddle.UI
 
         public void Update(Rectangle viewArea, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
+            Root?.DoMeasure(new Vector2(viewArea.Width, viewArea.Height));
             Root?.DoArrange(new RectangleF(viewArea.X, viewArea.Y, viewArea.Width, viewArea.Height));
             ProcessMouse(viewArea, mousePosition, mouseWentDown, mouseWentUp);
         }
@@ -87,14 +88,13 @@ namespace GDFiddle.UI
 
         private void LetControlProcessMouse(Control control, Vector2 mousePosition, bool mouseWentDown, bool mouseWentUp)
         {
-            var localMousePosition = control.ScreenToLocal(mousePosition);
             if (mouseWentDown)
             {
                 SwitchFocusTo(control.IsFocusable ? control : null);
-                control.OnMouseDown(localMousePosition);
+                control.OnMouseDown(mousePosition);
             }
-            if (mouseWentUp) control.OnMouseUp(localMousePosition);
-            if (_previousMousePosition != mousePosition) control.OnMouseMove(_previousMousePosition, localMousePosition);
+            if (mouseWentUp) control.OnMouseUp(mousePosition);
+            if (_previousMousePosition != mousePosition) control.OnMouseMove(_previousMousePosition, mousePosition);
             MouseCursor = control.MouseCursor;
         }
 

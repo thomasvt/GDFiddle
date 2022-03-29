@@ -32,14 +32,14 @@ namespace GDFiddle.UI.Controls
         protected override void Render(GuiRenderer guiRenderer)
         {
             base.Render(guiRenderer);
-            guiRenderer.DrawRectangle(new Vector2(0, 0), ArrangedSize, null, IsFocused ? Color.Yellow : Color.White);
+            guiRenderer.DrawRectangle(new Vector2(0, 0), ArrangedSize, null, IsFocused ? BorderFocused : Color.White);
             if (IsFocused)
             {
                 if (_selectionLength > 0)
                 {
-                    var selectionStart = Font.Measure(InputText.Substring(0, _selectionStart)).X;
-                    var selectionLength = Font.Measure(InputText.Substring(0, _selectionStart + _selectionLength)).X - selectionStart;
-                    guiRenderer.DrawRectangle(new Vector2(selectionStart + Padding, Padding), new Vector2(selectionLength, Font.LineHeight), new Color(Color.Yellow, 0.3f), null);
+                    var selectionStart = Font.Measure(InputText[.._selectionStart]).X;
+                    var selectionLength = Font.Measure(InputText[..(_selectionStart + _selectionLength)]).X - selectionStart;
+                    guiRenderer.DrawRectangle(new Vector2(selectionStart + Padding, Padding), new Vector2(selectionLength, Font.LineHeight), new Color(BorderFocused, 0.3f), null);
                 }
                 guiRenderer.DrawText(Padding, Padding, InputText, Color.White, Font);
                 if (_carretBlinkStopwatch.ElapsedMilliseconds % 1000 < 500)
@@ -52,11 +52,6 @@ namespace GDFiddle.UI.Controls
             {
                 guiRenderer.DrawText(Padding, Padding, Text, Color.White, Font);
             }
-        }
-
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
-        {
-            return new Vector2(parentAvailableSize.X, Font.LineHeight + Padding * 2);
         }
 
         internal override void OnTextInput(Keys pressedKey, char typedCharacter)
@@ -229,5 +224,7 @@ namespace GDFiddle.UI.Controls
         /// Triggered when a user confirmed an input typed in the <see cref="TextBox"/>. Cancels the ending of the user input if you return false.
         /// </summary>
         public event Action<string>? InputCompleted;
+
+        public Color BorderFocused { get; set; } = new Color(250, 206, 50);
     }
 }

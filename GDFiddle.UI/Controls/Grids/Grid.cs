@@ -14,19 +14,29 @@ namespace GDFiddle.UI.Controls.Grids
             _rowDistributor = new GridChildDistributor();
         }
 
-        protected override Vector2 Arrange(Vector2 parentAvailableSize)
+        protected override Vector2 Measure(Vector2 availableSize)
         {
-            _columnDistributor.CalculatePartSizes(parentAvailableSize.X);
-            _rowDistributor.CalculatePartSizes(parentAvailableSize.Y);
+            _columnDistributor.CalculatePartSizes(availableSize.X);
+            _rowDistributor.CalculatePartSizes(availableSize.Y);
 
-            foreach (var child in Children)
+            foreach (var (control, gridProperties) in Children)
             {
-                var horizontalActual = _columnDistributor.GetActualLayout(child.MetaData.Column);
-                var verticalActual = _rowDistributor.GetActualLayout(child.MetaData.Row);
-                child.Control.DoArrange(new RectangleF(horizontalActual.Offset, verticalActual.Offset, horizontalActual.Size, verticalActual.Size));
+                var horizontalActual = _columnDistributor.GetActualLayout(gridProperties.Column);
+                var verticalActual = _rowDistributor.GetActualLayout(gridProperties.Row);
+                control.DoMeasure(new Vector2(horizontalActual.Size, verticalActual.Size));
             }
 
-            return parentAvailableSize;
+            return availableSize;
+        }
+
+        protected override void Arrange(Vector2 assignedSize)
+        {
+            foreach (var (control, gridProperties) in Children)
+            {
+                var horizontalActual = _columnDistributor.GetActualLayout(gridProperties.Column);
+                var verticalActual = _rowDistributor.GetActualLayout(gridProperties.Row);
+                control.DoArrange(new RectangleF(horizontalActual.Offset, verticalActual.Offset, horizontalActual.Size, verticalActual.Size));
+            }
         }
 
         protected override IEnumerable<Control> GetVisibleChildren()
