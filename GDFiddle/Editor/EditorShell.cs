@@ -1,5 +1,4 @@
-﻿using GDFiddle.Ecs;
-using GDFiddle.Framework.Messaging;
+﻿using GDFiddle.Framework.Messaging;
 using GDFiddle.UI.Controls;
 using GDFiddle.UI.Controls.Grids;
 using Microsoft.Xna.Framework;

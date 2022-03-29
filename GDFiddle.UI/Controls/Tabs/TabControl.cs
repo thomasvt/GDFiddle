@@ -10,7 +10,7 @@ namespace GDFiddle.UI.Controls.Tabs
 
         public TabControl()
         {
-            TabPages = new ItemWithMetaCollection<TabProperties>(this);
+            TabPages = new ItemWithMetaCollection<TabProperties>(this, () => new TabHeaderButton());
             IsMouseInteractive = true;
         }
 
