@@ -18,7 +18,7 @@ namespace GDFiddle.Editor
         {
             _fieldsPerComponentType = new Dictionary<Type, List<ComponentField>>(64);
             _propertiesPanelItemsPerField = new Dictionary<ComponentField, PropertiesPanelItem2>(64);
-            Content = new ItemsControl() { Spacing = 8f };
+            Content = new ItemsControl { Spacing = 8f };
             Padding = new Vector2(12, 8);
             ConfigureMessages(messageBus);
         }

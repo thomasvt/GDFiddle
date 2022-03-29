@@ -23,7 +23,7 @@ namespace GDFiddle.Editor
                             TabPages =
                             {
                                 { new TextBlock {Text = "Properties" }, new TabProperties(new PropertiesPanel(messageBus)) },
-                                { new TextBlock {Text = "Entities" }, new TabProperties(new TextBlock { Text = "Hello Entities" }) }
+                                { new TextBlock {Text = "Entities" }, new TabProperties(new EntitiesPanel(messageBus)) }
                             }
                         }, 
                         new GridProperties(0, 0)
