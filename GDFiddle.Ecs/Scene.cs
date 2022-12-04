@@ -3,7 +3,6 @@ using GDFiddle.Ecs.Bulk;
 using GDFiddle.Ecs.ComponentStore;
 using GDFiddle.Ecs.Querying;
 using GDFiddle.Ecs.Scheduling;
-using GDFiddle.Ecs.Systems;
 
 namespace GDFiddle.Ecs
 {

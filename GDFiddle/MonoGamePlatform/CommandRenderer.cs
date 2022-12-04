@@ -26,6 +26,7 @@ namespace GDFiddle.MonoGamePlatform
             _effect.Projection = Matrix.CreateOrthographicOffCenter(0, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, 0, 0.1f, 5);
             _effect.View = Matrix.CreateLookAt(new Vector3(0, 0, 1), new Vector3(0, 0, 0), Vector3.UnitY);
             _effect.VertexColorEnabled = true;
+            
             _graphicsDevice.RasterizerState = _rasterizerState;
             _graphicsDevice.BlendState = BlendState.NonPremultiplied;
             _graphicsDevice.SamplerStates[0] = SamplerState.PointClamp;
